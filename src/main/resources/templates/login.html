@@ -1,0 +1,1236 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Hospital Management System</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <style>
+
+        /* =====================================================
+           LOGIN PAGE
+           ===================================================== */
+
+        body {
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef7fb 0%,
+                    #f8fbfd 50%,
+                    #e8f4f7 100%
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .login-container {
+            width: 100%;
+            max-width: 1050px;
+
+            min-height: 620px;
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            background: #ffffff;
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 20px 60px rgba(18, 59, 90, 0.12);
+
+            border: 1px solid #dce6ed;
+        }
+
+
+        /* =====================================================
+           LEFT SIDE
+           ===================================================== */
+
+        .login-brand-section {
+            background:
+                linear-gradient(
+                    145deg,
+                    #123b5a,
+                    #0b557c
+                );
+
+            color: #ffffff;
+
+            padding: 55px 50px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: space-between;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .login-brand-section::before {
+            content: "";
+
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            border-radius: 50%;
+
+            background: rgba(
+                15,
+                157,
+                154,
+                0.12
+            );
+
+            right: -120px;
+            top: -100px;
+        }
+
+
+        .login-brand-section::after {
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+            height: 250px;
+
+            border-radius: 50%;
+
+            background: rgba(
+                255,
+                255,
+                255,
+                0.04
+            );
+
+            left: -100px;
+            bottom: -100px;
+        }
+
+
+        .login-brand {
+            position: relative;
+
+            z-index: 1;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .login-brand-logo {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 11px;
+
+            background: #11b6b1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 25px;
+
+            font-weight: 700;
+        }
+
+
+        .login-brand-name {
+            font-size: 18px;
+
+            font-weight: 600;
+        }
+
+
+        .login-brand-subtitle {
+            font-size: 11px;
+
+            color: rgba(
+                255,
+                255,
+                255,
+                0.65
+            );
+
+            margin-top: 2px;
+        }
+
+
+        .login-introduction {
+            position: relative;
+
+            z-index: 1;
+        }
+
+
+        .login-introduction h1 {
+            font-size: 34px;
+
+            line-height: 1.2;
+
+            font-weight: 600;
+
+            margin-bottom: 14px;
+        }
+
+
+        .login-introduction h1 span {
+            color: #45d1cb;
+        }
+
+
+        .login-introduction p {
+            max-width: 390px;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+            color: rgba(
+                255,
+                255,
+                255,
+                0.72
+            );
+        }
+
+
+        .login-features {
+            position: relative;
+
+            z-index: 1;
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 30px;
+        }
+
+
+        .login-feature {
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: rgba(
+                255,
+                255,
+                255,
+                0.07
+            );
+
+            border: 1px solid rgba(
+                255,
+                255,
+                255,
+                0.07
+            );
+        }
+
+
+        .login-feature-icon {
+            font-size: 17px;
+
+            margin-bottom: 5px;
+
+            color: #45d1cb;
+        }
+
+
+        .login-feature-title {
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+
+        .login-feature-text {
+            margin-top: 2px;
+
+            font-size: 9px;
+
+            color: rgba(
+                255,
+                255,
+                255,
+                0.55
+            );
+        }
+
+
+        .login-footer {
+            position: relative;
+
+            z-index: 1;
+
+            font-size: 9px;
+
+            color: rgba(
+                255,
+                255,
+                255,
+                0.45
+            );
+        }
+
+
+        /* =====================================================
+           RIGHT SIDE
+           ===================================================== */
+
+        .login-form-section {
+            padding: 55px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        .login-form-container {
+            width: 100%;
+
+            max-width: 360px;
+        }
+
+
+        .login-form-header {
+            margin-bottom: 28px;
+        }
+
+
+        .login-form-header h2 {
+            font-size: 25px;
+
+            font-weight: 600;
+
+            color: #182b3a;
+        }
+
+
+        .login-form-header p {
+            margin-top: 5px;
+
+            font-size: 11px;
+
+            color: #667b8c;
+        }
+
+
+        /* =====================================================
+           FORM
+           ===================================================== */
+
+        .login-form {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 17px;
+        }
+
+
+        .login-field {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+
+        .login-label {
+            font-size: 11px;
+
+            font-weight: 600;
+
+            color: #334b5c;
+        }
+
+
+        .login-input-wrapper {
+            position: relative;
+        }
+
+
+        .login-input-icon {
+            position: absolute;
+
+            left: 12px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #8296a5;
+
+            font-size: 14px;
+        }
+
+
+        .login-input {
+            width: 100%;
+
+            height: 43px;
+
+            border: 1px solid #dce6ed;
+
+            border-radius: 7px;
+
+            outline: none;
+
+            padding: 0 12px 0 38px;
+
+            font-size: 12px;
+
+            color: #182b3a;
+
+            background: #ffffff;
+
+            transition: 0.2s;
+        }
+
+
+        .login-input:focus {
+            border-color: #0f6fae;
+
+            box-shadow:
+                0 0 0 3px rgba(
+                    15,
+                    111,
+                    174,
+                    0.08
+                );
+        }
+
+
+        .login-input::placeholder {
+            color: #a4b2bc;
+        }
+
+
+        .password-toggle {
+            position: absolute;
+
+            right: 10px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: 0;
+
+            background: transparent;
+
+            color: #8296a5;
+
+            cursor: pointer;
+
+            font-size: 12px;
+        }
+
+
+        .password-toggle:hover {
+            color: #0f6fae;
+        }
+
+
+        /* =====================================================
+           LOGIN OPTIONS
+           ===================================================== */
+
+        .login-options {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-top: -3px;
+        }
+
+
+        .remember-me {
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            font-size: 10px;
+
+            color: #667b8c;
+        }
+
+
+        .remember-me input {
+            accent-color: #0f6fae;
+        }
+
+
+        .forgot-password {
+            border: 0;
+
+            background: transparent;
+
+            text-decoration: none;
+
+            color: #0f6fae;
+
+            font-size: 10px;
+
+            cursor: pointer;
+        }
+
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           LOGIN BUTTON
+           ===================================================== */
+
+        .login-button {
+            width: 100%;
+
+            height: 43px;
+
+            border: 0;
+
+            border-radius: 7px;
+
+            background: #0f6fae;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.1s ease;
+        }
+
+
+        .login-button:hover {
+            background: #0b4f7c;
+        }
+
+
+        .login-button:active {
+            transform: translateY(1px);
+        }
+
+
+        .login-button:disabled {
+            opacity: 0.65;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =====================================================
+           ERROR
+           ===================================================== */
+
+        .login-error {
+            display: none;
+
+            padding: 10px 12px;
+
+            border-radius: 6px;
+
+            background: #fdebed;
+
+            border: 1px solid #f5c8cc;
+
+            color: #c5303b;
+
+            font-size: 10px;
+        }
+
+
+        .login-error.show {
+            display: block;
+        }
+
+
+        /* =====================================================
+           LOGIN INFORMATION
+           ===================================================== */
+
+        .login-info {
+            margin-top: 22px;
+
+            padding-top: 17px;
+
+            border-top: 1px solid #e5edf2;
+
+            text-align: center;
+
+            font-size: 9px;
+
+            color: #8a9aa6;
+        }
+
+
+        /* =====================================================
+           REGISTER LINK
+           ===================================================== */
+
+        .register-link {
+            margin-top: 18px;
+
+            text-align: center;
+
+            font-size: 10px;
+
+            color: #667b8c;
+        }
+
+
+        .register-link a {
+            color: #0f6fae;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 15px;
+            }
+
+
+            .login-container {
+                grid-template-columns: 1fr;
+
+                min-height: auto;
+            }
+
+
+            .login-brand-section {
+                padding: 30px;
+
+                min-height: 300px;
+            }
+
+
+            .login-introduction h1 {
+                font-size: 26px;
+            }
+
+
+            .login-features {
+                display: none;
+            }
+
+
+            .login-footer {
+                margin-top: 25px;
+            }
+
+
+            .login-form-section {
+                padding: 35px 30px;
+            }
+        }
+
+
+        @media (max-width: 480px) {
+
+            .login-brand-section {
+                padding: 25px;
+            }
+
+
+            .login-form-section {
+                padding: 30px 20px;
+            }
+
+
+            .login-brand-name {
+                font-size: 15px;
+            }
+
+
+            .login-introduction h1 {
+                font-size: 23px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="login-container">
+
+
+    <!-- =====================================================
+         LEFT BRAND SECTION
+         ===================================================== -->
+
+    <section class="login-brand-section">
+
+        <div class="login-brand">
+
+            <div class="login-brand-logo">
+                +
+            </div>
+
+            <div>
+
+                <div class="login-brand-name">
+                    Hospital Management System
+                </div>
+
+                <div class="login-brand-subtitle">
+                    Integrated Hospital Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="login-introduction">
+
+            <h1>
+                Healthcare
+                <span>simplified.</span>
+            </h1>
+
+
+            <p>
+                A centralized platform for managing patients,
+                doctors, appointments, medical records and billing
+                securely and efficiently.
+            </p>
+
+
+            <div class="login-features">
+
+
+                <div class="login-feature">
+
+                    <div class="login-feature-icon">
+                        +
+                    </div>
+
+                    <div class="login-feature-title">
+                        Patient Care
+                    </div>
+
+                    <div class="login-feature-text">
+                        Complete patient management
+                    </div>
+
+                </div>
+
+
+                <div class="login-feature">
+
+                    <div class="login-feature-icon">
+                        ✚
+                    </div>
+
+                    <div class="login-feature-title">
+                        Clinical Management
+                    </div>
+
+                    <div class="login-feature-text">
+                        Doctors and medical records
+                    </div>
+
+                </div>
+
+
+                <div class="login-feature">
+
+                    <div class="login-feature-icon">
+                        ✓
+                    </div>
+
+                    <div class="login-feature-title">
+                        Secure Access
+                    </div>
+
+                    <div class="login-feature-text">
+                        Role-based authentication
+                    </div>
+
+                </div>
+
+
+                <div class="login-feature">
+
+                    <div class="login-feature-icon">
+                        ₹
+                    </div>
+
+                    <div class="login-feature-title">
+                        Billing
+                    </div>
+
+                    <div class="login-feature-text">
+                        Simple payment management
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <div class="login-footer">
+
+            © 2026 Hospital Management System.
+            All rights reserved.
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         LOGIN FORM
+         ===================================================== -->
+
+    <section class="login-form-section">
+
+        <div class="login-form-container">
+
+
+            <div class="login-form-header">
+
+                <h2>
+                    Welcome back
+                </h2>
+
+                <p>
+                    Sign in to access your hospital dashboard.
+                </p>
+
+            </div>
+
+
+            <form
+                id="loginForm"
+                class="login-form"
+            >
+
+
+                <!-- Username -->
+
+                <div class="login-field">
+
+                    <label
+                        for="username"
+                        class="login-label"
+                    >
+                        Username
+                    </label>
+
+
+                    <div class="login-input-wrapper">
+
+                        <span class="login-input-icon">
+                            👤
+                        </span>
+
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="login-input"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="login-field">
+
+                    <label
+                        for="password"
+                        class="login-label"
+                    >
+                        Password
+                    </label>
+
+
+                    <div class="login-input-wrapper">
+
+                        <span class="login-input-icon">
+                            🔒
+                        </span>
+
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="login-input"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Options -->
+
+                <div class="login-options">
+
+                    <label class="remember-me">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                        >
+
+                        Remember me
+
+                    </label>
+
+
+                    <a
+                        href="/forgot-password"
+                        class="forgot-password"
+                    >
+                        Forgot password?
+                    </a>
+
+                </div>
+
+
+                <!-- Error -->
+
+                <div
+                    id="loginError"
+                    class="login-error"
+                ></div>
+
+
+                <!-- Login Button -->
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+                    Sign In
+                </button>
+
+            </form>
+
+
+            <!-- Security information -->
+
+            <div class="login-info">
+
+                Authorized users only.
+                Your activity may be monitored for security purposes.
+
+            </div>
+
+
+            <!-- =================================================
+                 PATIENT REGISTRATION
+                 ================================================= -->
+
+            <div class="register-link">
+
+                Don't have an account?
+
+                <a href="/register">
+                    Create Patient Account
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- =========================================================
+     API SERVICE
+     ========================================================= -->
+
+<script th:src="@{/js/api.js}"></script>
+
+
+<!-- =========================================================
+     LOGIN SCRIPT
+     ========================================================= -->
+
+<script>
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+
+    const usernameInput =
+        document.getElementById("username");
+
+
+    const passwordInput =
+        document.getElementById("password");
+
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+
+    const loginError =
+        document.getElementById("loginError");
+
+
+    const togglePassword =
+        document.getElementById("togglePassword");
+
+
+    /* =====================================================
+       PASSWORD VISIBILITY
+       ===================================================== */
+
+    togglePassword.addEventListener(
+        "click",
+        function () {
+
+            if (
+                passwordInput.type === "password"
+            ) {
+
+                passwordInput.type = "text";
+
+                togglePassword.textContent =
+                    "Hide";
+
+            } else {
+
+                passwordInput.type = "password";
+
+                togglePassword.textContent =
+                    "Show";
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       LOGIN
+       ===================================================== */
+
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            loginError.classList.remove(
+                "show"
+            );
+
+
+            const username =
+                usernameInput.value.trim();
+
+
+            const password =
+                passwordInput.value;
+
+
+            if (
+                !username ||
+                !password
+            ) {
+
+                showLoginError(
+                    "Please enter your username and password."
+                );
+
+                return;
+            }
+
+
+            loginButton.disabled = true;
+
+            loginButton.textContent =
+                "Signing in...";
+
+
+            try {
+
+                /*
+                 * Call /auth/login
+                 */
+
+                const response =
+                    await login(
+                        username,
+                        password
+                    );
+
+
+                /*
+                 * Get user role
+                 */
+
+                const role =
+                    response.role;
+
+
+                /*
+                 * Redirect according to role.
+                 *
+                 * At the moment all roles use
+                 * the same dashboard.
+                 *
+                 * We will improve this later
+                 * with separate role-based
+                 * dashboards.
+                 */
+
+                if (
+                    role === "ROLE_ADMIN" ||
+                    role === "ROLE_DOCTOR" ||
+                    role === "ROLE_PATIENT"
+                ) {
+
+                    window.location.href =
+                        "/dashboard";
+
+                } else {
+
+                    window.location.href =
+                        "/dashboard";
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Login failed:",
+                    error
+                );
+
+
+                showLoginError(
+                    error.message ||
+                    "Invalid username or password."
+                );
+
+
+                loginButton.disabled = false;
+
+                loginButton.textContent =
+                    "Sign In";
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       ERROR MESSAGE
+       ===================================================== */
+
+    function showLoginError(message) {
+
+        loginError.textContent =
+            message;
+
+        loginError.classList.add(
+            "show"
+        );
+    }
+
+</script>
+
+
+</body>
+
+</html>
+

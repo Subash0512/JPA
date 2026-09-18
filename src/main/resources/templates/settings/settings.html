@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Settings | Hospital Management System</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        .settings-main {
+            min-height: 100vh;
+            background: #f5f8fb;
+        }
+
+        .settings-page {
+            padding: 28px;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .settings-title {
+            margin: 0;
+            color: #102a43;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .settings-subtitle {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .settings-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            padding: 22px;
+        }
+
+        .settings-card + .settings-card {
+            margin-top: 20px;
+        }
+
+        .settings-card-title {
+            margin: 0;
+            color: #102a43;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .settings-card-subtitle {
+            margin-top: 5px;
+            margin-bottom: 18px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .account-hero {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 20px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .account-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #164e63;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .account-name {
+            color: #102a43;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .account-role {
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .info-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .info-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .info-value {
+            color: #102a43;
+            font-size: 14px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .status-enabled {
+            color: #166534;
+        }
+
+        .status-disabled {
+            color: #b91c1c;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .setting-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .setting-row:first-child {
+            padding-top: 0;
+        }
+
+        .setting-row-title {
+            color: #102a43;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .setting-row-text {
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .badge {
+            flex: 0 0 auto;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #334e68;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #334e68;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 11px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #64748b;
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.12);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 42px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .btn-primary-settings {
+            border: 0;
+            border-radius: 8px;
+            background: #164e63;
+            color: #fff;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-primary-settings:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .feedback.success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .feedback.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .security-note {
+            padding: 12px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .loading-state {
+            padding: 20px;
+            color: #64748b;
+            text-align: center;
+        }
+
+        @media (max-width: 1000px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .settings-page {
+                padding: 16px;
+            }
+
+            .settings-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-title">Hospital Management</div>
+                <div class="brand-subtitle">Information System</div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">Main</div>
+
+            <a href="/dashboard"
+               class="nav-item"
+               data-nav-key="dashboard">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ui/patients"
+               class="nav-item"
+               data-nav-key="patients">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+                <span>Patients</span>
+            </a>
+
+            <a href="/ui/doctors"
+               class="nav-item"
+               data-nav-key="doctors">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+                <span>Doctors</span>
+            </a>
+
+            <a href="/ui/appointments"
+               class="nav-item"
+               data-nav-key="appointments">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+                <span>Appointments</span>
+            </a>
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+            <a href="/ui/medical-records"
+               class="nav-item"
+               data-nav-key="medical">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+                <span>Medical Records</span>
+            </a>
+
+            <a href="/ui/billing"
+               class="nav-item"
+               data-nav-key="billing">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+                <span>Billing</span>
+            </a>
+
+            <div class="nav-section-title system-section">
+                System
+            </div>
+
+            <a href="/ui/reports"
+               class="nav-item"
+               data-nav-key="reports">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ui/staff"
+               class="nav-item"
+               data-nav-key="staff">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-users-gear"></i>
+                </span>
+                <span>Staff Accounts</span>
+            </a>
+
+            <a href="/ui/settings"
+               class="nav-item active"
+               data-nav-key="settings">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+                <span>Settings</span>
+            </a>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                System operational
+            </div>
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+                <span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+    <main class="main-wrapper settings-main">
+
+        <header class="app-header">
+
+            <div class="page-heading">
+                <h1>Settings</h1>
+                <p>Manage your account and security settings</p>
+            </div>
+
+            <div class="header-right">
+
+                <button type="button"
+                        class="header-icon"
+                        title="Refresh account"
+                        onclick="loadAccount()">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+                <div class="profile">
+                    <div class="profile-avatar" id="profileAvatar">A</div>
+                    <div class="profile-info">
+                        <span class="profile-name" id="profileName">Administrator</span>
+                        <span class="profile-role" id="profileRole">Administrator</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="page-content settings-page">
+
+            <div class="settings-layout">
+
+                <!-- =================================================
+                     LEFT COLUMN
+                     ================================================= -->
+                <div>
+
+                    <div class="settings-card">
+
+                        <h2 class="settings-card-title">
+                            Account Information
+                        </h2>
+
+                        <p class="settings-card-subtitle">
+                            Current signed-in account details
+                        </p>
+
+                        <div id="accountLoading"
+                             class="loading-state">
+                            Loading account...
+                        </div>
+
+                        <div id="accountContent"
+                             style="display:none;">
+
+                            <div class="account-hero">
+                                <div class="account-avatar"
+                                     id="accountAvatar">
+                                    A
+                                </div>
+
+                                <div>
+                                    <div class="account-name"
+                                         id="accountDisplayName">
+                                        Administrator
+                                    </div>
+
+                                    <div class="account-role"
+                                         id="accountDisplayRole">
+                                        Administrator
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-grid">
+
+                                <div class="info-box">
+                                    <span class="info-label">
+                                        Username
+                                    </span>
+
+                                    <span class="info-value"
+                                          id="accountUsername">
+                                        --
+                                    </span>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-label">
+                                        Role
+                                    </span>
+
+                                    <span class="info-value"
+                                          id="accountRole">
+                                        --
+                                    </span>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-label">
+                                        Account ID
+                                    </span>
+
+                                    <span class="info-value"
+                                          id="accountId">
+                                        --
+                                    </span>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-label">
+                                        Status
+                                    </span>
+
+                                    <span class="info-value"
+                                          id="accountStatus">
+                                        --
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="settings-card">
+
+                        <h2 class="settings-card-title">
+                            System Settings
+                        </h2>
+
+                        <p class="settings-card-subtitle">
+                            Current application configuration
+                        </p>
+
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-row-title">
+                                    Application
+                                </div>
+                                <div class="setting-row-text">
+                                    Hospital Management System
+                                </div>
+                            </div>
+
+                            <span class="badge">
+                                ACTIVE
+                            </span>
+                        </div>
+
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-row-title">
+                                    Authentication
+                                </div>
+                                <div class="setting-row-text">
+                                    JWT-based authenticated access
+                                </div>
+                            </div>
+
+                            <span class="badge">
+                                ENABLED
+                            </span>
+                        </div>
+
+                        <div class="setting-row">
+                            <div>
+                                <div class="setting-row-title">
+                                    Password Security
+                                </div>
+                                <div class="setting-row-text">
+                                    Passwords are stored using BCrypt hashing.
+                                </div>
+                            </div>
+
+                            <span class="badge">
+                                SECURE
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     RIGHT COLUMN
+                     ================================================= -->
+                <div>
+
+                    <div class="settings-card">
+
+                        <h2 class="settings-card-title">
+                            Change Password
+                        </h2>
+
+                        <p class="settings-card-subtitle">
+                            Change the password for your current account
+                        </p>
+
+                        <form id="passwordForm">
+
+                            <div class="form-group">
+                                <label for="currentPassword">
+                                    Current Password
+                                </label>
+
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="currentPassword"
+                                        autocomplete="current-password"
+                                        required>
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        onclick="togglePassword('currentPassword', this)">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="newPassword">
+                                    New Password
+                                </label>
+
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="newPassword"
+                                        minlength="6"
+                                        autocomplete="new-password"
+                                        required>
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        onclick="togglePassword('newPassword', this)">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="confirmPassword">
+                                    Confirm New Password
+                                </label>
+
+                                <div class="password-wrapper">
+                                    <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        minlength="6"
+                                        autocomplete="new-password"
+                                        required>
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        onclick="togglePassword('confirmPassword', this)">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <div class="security-note">
+                                Use at least 6 characters and choose a password
+                                that is different from your current password.
+                            </div>
+
+                            <div id="passwordFeedback"
+                                 class="feedback">
+                            </div>
+
+                            <div class="form-actions">
+
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    onclick="resetPasswordForm()">
+                                    Clear
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    class="btn-primary-settings"
+                                    id="changePasswordButton">
+                                    Change Password
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script th:src="@{/js/api.js}"></script>
+
+<script>
+
+    /* =====================================================
+       ROLE
+       ===================================================== */
+
+    const currentRole = String(
+        localStorage.getItem("role") || ""
+    )
+        .replace(/^ROLE_/i, "")
+        .toUpperCase();
+
+
+    /* =====================================================
+       ROLE GUARD
+       ===================================================== */
+
+    function enforceSettingsRole() {
+
+        if (currentRole !== "ADMIN") {
+            window.location.replace("/dashboard");
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /* =====================================================
+       ROLE DISPLAY
+       ===================================================== */
+
+    function roleLabel(role) {
+
+        switch (String(role || "")
+            .replace(/^ROLE_/i, "")
+            .toUpperCase()) {
+
+            case "ADMIN":
+                return "Administrator";
+
+            case "DOCTOR":
+                return "Doctor";
+
+            case "PATIENT":
+                return "Patient";
+
+            default:
+                return "User";
+        }
+    }
+
+
+    /* =====================================================
+       LOAD ACCOUNT
+       ===================================================== */
+
+    async function loadAccount() {
+
+        if (!enforceSettingsRole()) {
+            return;
+        }
+
+        const loading =
+            document.getElementById("accountLoading");
+
+        const content =
+            document.getElementById("accountContent");
+
+        loading.style.display = "block";
+        content.style.display = "none";
+
+        try {
+
+            const account =
+                await apiGet("/account/me");
+
+            if (!account) {
+                throw new Error("Unable to load account information.");
+            }
+
+            const role =
+                roleLabel(account.role);
+
+            const username =
+                account.username ||
+                "Administrator";
+
+            document.getElementById(
+                "accountDisplayName"
+            ).textContent = username;
+
+            document.getElementById(
+                "accountDisplayRole"
+            ).textContent = role;
+
+            document.getElementById(
+                "accountUsername"
+            ).textContent = username;
+
+            document.getElementById(
+                "accountRole"
+            ).textContent = role;
+
+            document.getElementById(
+                "accountId"
+            ).textContent = account.id ?? "--";
+
+            const statusElement =
+                document.getElementById(
+                    "accountStatus"
+                );
+
+            statusElement.textContent =
+                account.enabled
+                    ? "Active"
+                    : "Disabled";
+
+            statusElement.className =
+                account.enabled
+                    ? "info-value status-enabled"
+                    : "info-value status-disabled";
+
+            const firstLetter =
+                username
+                    .charAt(0)
+                    .toUpperCase() ||
+                "A";
+
+            document.getElementById(
+                "accountAvatar"
+            ).textContent = firstLetter;
+
+            document.getElementById(
+                "profileAvatar"
+            ).textContent = firstLetter;
+
+            document.getElementById(
+                "profileName"
+            ).textContent = username;
+
+            document.getElementById(
+                "profileRole"
+            ).textContent = role;
+
+            localStorage.setItem(
+                "username",
+                username
+            );
+
+            localStorage.setItem(
+                "role",
+                account.role || "ROLE_ADMIN"
+            );
+
+            loading.style.display = "none";
+            content.style.display = "block";
+
+        } catch (error) {
+
+            loading.textContent =
+                error.message ||
+                "Unable to load account information.";
+
+        }
+    }
+
+
+    /* =====================================================
+       PASSWORD TOGGLE
+       ===================================================== */
+
+    function togglePassword(inputId, button) {
+
+        const input =
+            document.getElementById(inputId);
+
+        const icon =
+            button.querySelector("i");
+
+        if (input.type === "password") {
+
+            input.type = "text";
+
+            icon.className =
+                "fa-regular fa-eye-slash";
+
+        } else {
+
+            input.type = "password";
+
+            icon.className =
+                "fa-regular fa-eye";
+        }
+    }
+
+
+    /* =====================================================
+       FEEDBACK
+       ===================================================== */
+
+    function showFeedback(message, type) {
+
+        const feedback =
+            document.getElementById(
+                "passwordFeedback"
+            );
+
+        feedback.textContent = message;
+        feedback.className =
+            "feedback " + type;
+    }
+
+
+    function clearFeedback() {
+
+        const feedback =
+            document.getElementById(
+                "passwordFeedback"
+            );
+
+        feedback.textContent = "";
+        feedback.className = "feedback";
+    }
+
+
+    /* =====================================================
+       RESET PASSWORD FORM
+       ===================================================== */
+
+    function resetPasswordForm() {
+
+        document.getElementById(
+            "passwordForm"
+        ).reset();
+
+        clearFeedback();
+    }
+
+
+    /* =====================================================
+       CHANGE PASSWORD
+       ===================================================== */
+
+    document
+        .getElementById("passwordForm")
+        .addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            if (!enforceSettingsRole()) {
+                return;
+            }
+
+            clearFeedback();
+
+            const currentPassword =
+                document.getElementById(
+                    "currentPassword"
+                ).value;
+
+            const newPassword =
+                document.getElementById(
+                    "newPassword"
+                ).value;
+
+            const confirmPassword =
+                document.getElementById(
+                    "confirmPassword"
+                ).value;
+
+            if (newPassword.length < 6) {
+
+                showFeedback(
+                    "New password must be at least 6 characters.",
+                    "error"
+                );
+
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+
+                showFeedback(
+                    "New password and confirmation do not match.",
+                    "error"
+                );
+
+                return;
+            }
+
+            const button =
+                document.getElementById(
+                    "changePasswordButton"
+                );
+
+            button.disabled = true;
+            button.textContent = "Changing...";
+
+            try {
+
+                const response =
+                    await apiPut(
+                        "/account/password",
+                        {
+                            currentPassword,
+                            newPassword,
+                            confirmPassword
+                        }
+                    );
+
+                showFeedback(
+                    response?.message ||
+                    "Password changed successfully.",
+                    "success"
+                );
+
+                document
+                    .getElementById("passwordForm")
+                    .reset();
+
+            } catch (error) {
+
+                showFeedback(
+                    error.message ||
+                    "Unable to change password.",
+                    "error"
+                );
+
+            } finally {
+
+                button.disabled = false;
+                button.textContent = "Change Password";
+            }
+        });
+
+
+    /* =====================================================
+       INITIALIZE
+       ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            if (!enforceSettingsRole()) {
+                return;
+            }
+
+            loadAccount();
+        }
+    );
+
+</script>
+
+</body>
+</html>

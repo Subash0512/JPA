@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | Hospital Management System</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        .notifications-main {
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .notifications-page {
+            padding: 28px;
+        }
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .notifications-title {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: #102a43;
+        }
+
+        .notifications-subtitle {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .notifications-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .notification-action {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #102a43;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .notification-action:hover {
+            background: #f8fafc;
+        }
+
+        .notifications-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #eef2f7;
+            cursor: pointer;
+            transition: background .2s ease;
+        }
+
+        .notification-row:last-child {
+            border-bottom: 0;
+        }
+
+        .notification-row:hover {
+            background: #f8fafc;
+        }
+
+        .notification-row.unread {
+            background: #f8fbff;
+        }
+
+        .notification-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-top: 18px;
+            flex: 0 0 9px;
+            background: #cbd5e1;
+        }
+
+        .notification-row.unread .notification-dot {
+            background: #2563eb;
+        }
+
+        .notification-page-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 42px;
+        }
+
+        .notification-page-icon.blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .notification-page-icon.yellow {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .notification-page-icon.green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .notification-page-icon.red {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .notification-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-row-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #102a43;
+        }
+
+        .notification-row-description {
+            margin-top: 4px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .notification-row-time {
+            margin-top: 7px;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        .notification-badge {
+            flex: 0 0 auto;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .notification-empty {
+            padding: 60px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .notification-empty-icon {
+            font-size: 34px;
+            margin-bottom: 12px;
+            color: #94a3b8;
+        }
+
+        .notification-empty-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #334e68;
+            margin-bottom: 6px;
+        }
+
+        .notification-empty-text {
+            font-size: 13px;
+        }
+
+        .notification-error {
+            padding: 24px;
+            text-align: center;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 700px) {
+            .notifications-page {
+                padding: 16px;
+            }
+
+            .notifications-header {
+                flex-direction: column;
+            }
+
+            .notifications-actions {
+                width: 100%;
+            }
+
+            .notification-action {
+                flex: 1;
+            }
+
+            .notification-row {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-title">Hospital Management</div>
+                <div class="brand-subtitle">Information System</div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">Main</div>
+
+            <a href="/dashboard"
+               class="nav-item"
+               data-nav-key="dashboard">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ui/patients"
+               class="nav-item"
+               data-nav-key="patients">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+                <span>Patients</span>
+            </a>
+
+            <a href="/ui/doctors"
+               class="nav-item"
+               data-nav-key="doctors">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+                <span>Doctors</span>
+            </a>
+
+            <a href="/ui/appointments"
+               class="nav-item"
+               data-nav-key="appointments">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+                <span>Appointments</span>
+            </a>
+
+            <div class="nav-section-title clinical-section">Clinical</div>
+
+            <a href="/ui/medical-records"
+               class="nav-item"
+               data-nav-key="medical">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+                <span>Medical Records</span>
+            </a>
+
+            <a href="/ui/billing"
+               class="nav-item"
+               data-nav-key="billing">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+                <span>Billing</span>
+            </a>
+
+            <div class="nav-section-title system-section">System</div>
+
+            <a href="/ui/reports"
+               class="nav-item"
+               data-nav-key="reports">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+                <span>Reports</span>
+            </a>
+
+            <a href="/ui/notifications"
+               class="nav-item active"
+               data-nav-key="notifications">
+                <span class="nav-icon">
+                    <i class="fa-regular fa-bell"></i>
+                </span>
+                <span>Notifications</span>
+                <span class="nav-badge" id="notificationsNavBadge">0</span>
+            </a>
+
+            <a href="/ui/staff"
+               class="nav-item"
+               data-nav-key="staff">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-users-gear"></i>
+                </span>
+                <span>Staff Accounts</span>
+            </a>
+
+            <a href="/ui/settings"
+               class="nav-item"
+               data-nav-key="settings">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+                <span>Settings</span>
+            </a>
+
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                System operational
+            </div>
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+                <span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-wrapper notifications-main">
+
+        <header class="app-header">
+
+            <div class="page-heading">
+                <h1>Notifications</h1>
+                <p>Recent updates from your hospital account</p>
+            </div>
+
+            <div class="header-right">
+
+                <button type="button"
+                        class="header-icon notification"
+                        title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-count"
+                          id="notificationCount">0</span>
+                </button>
+
+                <div class="profile">
+                    <div class="profile-avatar" id="profileAvatar">U</div>
+                    <div class="profile-info">
+                        <span class="profile-name" id="profileName">User</span>
+                        <span class="profile-role" id="profileRole">User</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="page-content notifications-page">
+
+            <div class="notifications-header">
+
+                <div>
+                    <h2 class="notifications-title">
+                        Your Notifications
+                    </h2>
+
+                    <div class="notifications-subtitle">
+                        Appointment, billing and medical record updates
+                    </div>
+                </div>
+
+                <div class="notifications-actions">
+
+                    <button type="button"
+                            class="notification-action"
+                            onclick="loadNotifications()">
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh
+                    </button>
+
+                    <button type="button"
+                            class="notification-action"
+                            onclick="markAllNotificationsRead()">
+                        <i class="fa-solid fa-check-double"></i>
+                        Mark all read
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="notifications-card">
+
+                <div id="notificationsList"
+                     class="notifications-list">
+
+                    <div class="notification-empty">
+                        <div class="notification-empty-icon">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                        <div class="notification-empty-title">
+                            Loading notifications...
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script th:src="@{/js/api.js}"></script>
+
+<script>
+
+let notifications = [];
+
+function notificationStorageKey() {
+    const username =
+        localStorage.getItem("username") || "user";
+
+    return "readNotifications:" + username;
+}
+
+function getReadNotificationIds() {
+    try {
+        return new Set(
+            JSON.parse(
+                localStorage.getItem(
+                    notificationStorageKey()
+                ) || "[]"
+            )
+        );
+    } catch (error) {
+        return new Set();
+    }
+}
+
+function saveReadNotificationIds(ids) {
+    localStorage.setItem(
+        notificationStorageKey(),
+        JSON.stringify([...ids])
+    );
+}
+
+function formatNotificationTime(value) {
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function escapeNotificationHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderNotifications() {
+
+    const container =
+        document.getElementById("notificationsList");
+
+    const readIds =
+        getReadNotificationIds();
+
+    if (!notifications.length) {
+
+        container.innerHTML = `
+            <div class="notification-empty">
+                <div class="notification-empty-icon">
+                    <i class="fa-regular fa-bell-slash"></i>
+                </div>
+                <div class="notification-empty-title">
+                    No notifications
+                </div>
+                <div class="notification-empty-text">
+                    You're all caught up.
+                </div>
+            </div>
+        `;
+
+        updateNotificationBadges(0);
+
+        return;
+    }
+
+    const unreadCount =
+        notifications.filter(
+            item => !readIds.has(item.id)
+        ).length;
+
+    updateNotificationBadges(unreadCount);
+
+    container.innerHTML =
+        notifications.map(item => {
+
+            const unread =
+                !readIds.has(item.id);
+
+            const tone =
+                item.tone || "blue";
+
+            return `
+                <div
+                    class="notification-row ${unread ? "unread" : ""}"
+                    data-notification-id="${escapeNotificationHtml(item.id)}"
+                    onclick="openNotification('${escapeNotificationHtml(item.id)}')">
+
+                    <span class="notification-dot"></span>
+
+                    <div class="notification-page-icon ${escapeNotificationHtml(tone)}">
+                        <i class="${escapeNotificationHtml(item.icon || "fa-regular fa-bell")}"></i>
+                    </div>
+
+                    <div class="notification-body">
+
+                        <div class="notification-row-title">
+                            ${escapeNotificationHtml(item.title)}
+                        </div>
+
+                        <div class="notification-row-description">
+                            ${escapeNotificationHtml(item.description)}
+                        </div>
+
+                        <div class="notification-row-time">
+                            ${escapeNotificationHtml(
+                                formatNotificationTime(item.timestamp)
+                            )}
+                        </div>
+
+                    </div>
+
+                    <span class="notification-badge">
+                        ${escapeNotificationHtml(item.category || "SYSTEM")}
+                    </span>
+
+                </div>
+            `;
+        }).join("");
+}
+
+function updateNotificationBadges(count) {
+
+    const safeCount = Number(count || 0);
+
+    const headerBadge =
+        document.getElementById("notificationCount");
+
+    if (headerBadge) {
+        headerBadge.textContent = safeCount > 99
+            ? "99+"
+            : String(safeCount);
+    }
+
+    const navBadge =
+        document.getElementById("notificationsNavBadge");
+
+    if (navBadge) {
+        navBadge.textContent = safeCount > 99
+            ? "99+"
+            : String(safeCount);
+    }
+}
+
+async function loadNotifications() {
+
+    const container =
+        document.getElementById("notificationsList");
+
+    container.innerHTML = `
+        <div class="notification-empty">
+            <div class="notification-empty-icon">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+            </div>
+            <div class="notification-empty-title">
+                Loading notifications...
+            </div>
+        </div>
+    `;
+
+    try {
+
+        notifications =
+            await apiGet("/notifications") || [];
+
+        renderNotifications();
+
+    } catch (error) {
+
+        console.error(
+            "Notification loading error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="notification-error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Unable to load notifications.
+                <br>
+                ${escapeNotificationHtml(
+                    error?.message || "Please try again."
+                )}
+            </div>
+        `;
+    }
+}
+
+function openNotification(id) {
+
+    const notification =
+        notifications.find(
+            item => item.id === id
+        );
+
+    if (!notification) {
+        return;
+    }
+
+    const readIds =
+        getReadNotificationIds();
+
+    readIds.add(id);
+
+    saveReadNotificationIds(
+        readIds
+    );
+
+    renderNotifications();
+
+    if (notification.link) {
+        window.location.href =
+            notification.link;
+    }
+}
+
+function markAllNotificationsRead() {
+
+    const readIds =
+        getReadNotificationIds();
+
+    notifications.forEach(
+        item => readIds.add(item.id)
+    );
+
+    saveReadNotificationIds(
+        readIds
+    );
+
+    renderNotifications();
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadNotifications
+);
+
+</script>
+
+</body>
+</html>

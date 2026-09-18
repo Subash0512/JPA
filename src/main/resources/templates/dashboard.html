@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Hospital Management System</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        .snapshot-amount {
+            margin-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .snapshot-total {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .billing-total-row {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .dashboard-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .single-message {
+            padding: 28px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .appointment-highlight {
+            padding: 18px;
+        }
+
+        .appointment-highlight .doctor-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .appointment-highlight .appointment-meta {
+            color: #64748b;
+            margin: 5px 0;
+        }
+
+        .patient-summary {
+            padding: 18px;
+        }
+
+        .patient-summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 9px 0;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .patient-summary-row:last-child {
+            border-bottom: 0;
+        }
+
+        .quick-action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 18px;
+        }
+
+        .quick-action-grid a {
+            text-decoration: none;
+        }
+
+        @media (max-width: 700px) {
+            .quick-action-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+                <div class="brand-title">Hospital Management</div>
+                <div class="brand-subtitle">Information System</div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">Main</div>
+
+            <a href="/dashboard" class="nav-item active" data-nav-key="dashboard">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/ui/patients" class="nav-item" id="patientsNav" data-nav-key="patients">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+                <span>Patients</span>
+            </a>
+
+            <a href="/ui/doctors" class="nav-item" id="doctorsNav" data-nav-key="doctors">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+                <span>Doctors</span>
+            </a>
+
+            <a href="/ui/appointments" class="nav-item" data-nav-key="appointments">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+                <span>Appointments</span>
+                <span class="nav-badge" id="appointmentBadge">0</span>
+            </a>
+
+            <div class="nav-section-title clinical-section">Clinical</div>
+
+            <a href="/ui/medical-records" class="nav-item" data-nav-key="medical">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+                <span>Medical Records</span>
+            </a>
+
+            <a href="/ui/billing" class="nav-item" id="billingNav" data-nav-key="billing">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+                <span>Billing</span>
+            </a>
+
+            <div class="nav-section-title system-section" id="systemNavSection">System</div>
+
+            <a href="/ui/reports" id="reportsNav" class="nav-item" data-nav-key="reports">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+                <span>Reports</span>
+            </a>
+            <a href="/ui/notifications"
+               class="nav-item"
+               data-nav-key="notifications">
+                <span class="nav-icon">
+                    <i class="fa-regular fa-bell"></i>
+                </span>
+                <span>Notifications</span>
+                <span class="nav-badge" id="notificationsNavBadge">0</span>
+            </a>
+
+
+            <a href="/ui/staff" id="staffNav" class="nav-item" data-nav-key="staff">
+                <span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span>
+                <span>Staff Accounts</span>
+            </a>
+
+            <a href="/ui/settings" id="settingsNav" class="nav-item" data-nav-key="settings">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+                <span>Settings</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+                System operational
+            </div>
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+    <main class="main-wrapper">
+
+        <header class="app-header">
+
+            <div class="page-heading">
+                <h1>Dashboard</h1>
+                <p id="currentDate">Hospital overview</p>
+            </div>
+
+            <div class="header-right">
+
+                <div class="search-box" id="searchBox">
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+
+                    <input type="text"
+                           id="globalSearch"
+                           placeholder="Search patients, doctors...">
+                </div>
+
+                <button type="button"
+                        class="header-icon notification"
+                        title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="notification-count" id="notificationCount">0</span>
+                </button>
+
+                <div class="profile">
+
+                    <div class="profile-avatar" id="profileAvatar">U</div>
+
+                    <div class="profile-info">
+                        <span class="profile-name" id="profileName">User</span>
+                        <span class="profile-role" id="profileRole">User</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="page-content">
+
+            <!-- =================================================
+                 WELCOME
+                 ================================================= -->
+            <div class="welcome-card">
+
+                <div>
+                    <div class="welcome-title">
+                        Welcome back,
+                        <span id="welcomeName">User</span>
+                    </div>
+
+                    <div class="welcome-description" id="welcomeDescription">
+                        Here's what's happening across your hospital today.
+                    </div>
+                </div>
+
+                <div class="quick-actions" id="welcomeActions">
+
+                    <!-- ADMIN -->
+                    <a href="/ui/patients"
+                       class="btn btn-primary"
+                       id="adminAddPatientButton" data-nav-key="patients">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Add Patient
+                    </a>
+
+                    <a href="/ui/appointments"
+                       class="btn"
+                       id="adminNewAppointmentButton" data-nav-key="appointments">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        New Appointment
+                    </a>
+
+                    <!-- PATIENT -->
+                    <a href="/ui/appointments"
+                       class="btn btn-primary"
+                       id="patientBookAppointmentButton"
+                       style="display:none;" data-nav-key="appointments">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Book Appointment
+                    </a>
+                </div>
+            </div>
+
+            <!-- =================================================
+                 ADMIN KPI
+                 ================================================= -->
+            <div class="kpi-grid" id="adminKpiGrid">
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Total Patients</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="totalPatients">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-users"></i>
+                        &nbsp; Registered
+                    </div>
+
+                    <div class="kpi-description">Patient records</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Doctors</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="totalDoctors">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        &nbsp; Registered
+                    </div>
+
+                    <div class="kpi-description">Medical staff</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Appointments</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="totalAppointments">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        &nbsp; Scheduled
+                    </div>
+
+                    <div class="kpi-description">Appointment records</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Medical Records</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-file-medical"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="totalMedicalRecords">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-file-medical"></i>
+                        &nbsp; Records
+                    </div>
+
+                    <div class="kpi-description">Medical records</div>
+                </div>
+
+                <div class="kpi-card" id="billingKpiCard">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Billing Records</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="totalBills">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        &nbsp; Records
+                    </div>
+
+                    <div class="kpi-description">Billing information</div>
+                </div>
+            </div>
+
+            <!-- =================================================
+                 PATIENT KPI
+                 ================================================= -->
+            <div class="kpi-grid" id="patientKpiGrid" style="display:none;">
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">My Appointments</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="patientAppointmentCount">0</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        &nbsp; My bookings
+                    </div>
+
+                    <div class="kpi-description">Your appointment records</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Upcoming Appointment</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-calendar-day"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="patientUpcomingAppointment">--</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-clock"></i>
+                        &nbsp; Next visit
+                    </div>
+
+                    <div class="kpi-description" id="patientUpcomingDoctor">No upcoming appointment</div>
+                </div>
+
+                
+                
+            </div>
+
+            <!-- =================================================
+                 DOCTOR KPI
+                 ================================================= -->
+            <div class="kpi-grid" id="doctorKpiGrid" style="display:none;">
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">My Appointments</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="doctorAppointmentCount">0</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        &nbsp; Assigned
+                    </div>
+
+                    <div class="kpi-description">Your appointment schedule</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">My Patients</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-hospital-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="doctorPatientCount">0</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-user-injured"></i>
+                        &nbsp; Unique patients
+                    </div>
+
+                    <div class="kpi-description">Patients in your appointments</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Upcoming</div>
+                        <div class="kpi-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                    </div>
+
+                    <div class="kpi-value" id="doctorUpcomingCount">0</div>
+
+                    <div class="kpi-change">
+                        <i class="fa-solid fa-calendar-day"></i>
+                        &nbsp; Scheduled
+                    </div>
+
+                    <div class="kpi-description">Upcoming appointments</div>
+                </div>
+            </div>
+
+            <!-- =================================================
+                 MAIN GRID
+                 ================================================= -->
+            <div class="dashboard-grid">
+
+                <!-- APPOINTMENTS -->
+                <div class="card" id="appointmentsCard">
+
+                    <div class="card-header">
+
+                        <div>
+                            <div class="card-title" id="appointmentsTitle">
+                                Recent Appointments
+                            </div>
+
+                            <div class="card-subtitle" id="appointmentsSubtitle">
+                                Latest appointment activity
+                            </div>
+                        </div>
+
+                        <a href="/ui/appointments"
+                           class="card-link" data-nav-key="appointments">
+                            View all
+                        </a>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table class="data-table">
+
+                            <thead>
+                            <tr>
+                                <th id="appointmentPatientHeader">Patient</th>
+                                <th>Doctor</th>
+                                <th>Date &amp; Time</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="appointmentsTable">
+                            <tr>
+                                <td colspan="4">
+                                    <div class="loading">Loading appointments...</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div class="card" id="rightDashboardCard">
+
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title" id="rightCardTitle">
+                                Notifications
+                            </div>
+
+                            <div class="card-subtitle" id="rightCardSubtitle">
+                                Recent system activity
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN BILLING SNAPSHOT -->
+                    <div id="adminBillingSnapshot">
+
+                        <div class="notification-item">
+                            <div class="notification-icon blue">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+
+                            <div>
+                                <div class="notification-title">Appointments</div>
+                                <div class="notification-description">
+                                    Appointment information is available.
+                                </div>
+                                <div class="notification-time">Today</div>
+                            </div>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-icon yellow">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </div>
+
+                            <div>
+                                <div class="notification-title">Billing</div>
+                                <div class="notification-description">
+                                    Review billing information.
+                                </div>
+                                <div class="notification-time">Today</div>
+                            </div>
+                        </div>
+
+                        <div class="notification-item">
+                            <div class="notification-icon red">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <div>
+                                <div class="notification-title">Security</div>
+                                <div class="notification-description">
+                                    JWT authentication is active.
+                                </div>
+                                <div class="notification-time">Today</div>
+                            </div>
+                        </div>
+
+                        <div class="billing-snapshot" id="billingSnapshot">
+
+                            <div class="snapshot-title">Billing Snapshot</div>
+
+                            <div class="snapshot-row">
+                                <span>Paid</span>
+                                <span class="snapshot-value value-green">
+                                    <span id="paidBills">0</span>
+                                    <span class="snapshot-amount" id="paidAmount">₹0.00</span>
+                                </span>
+                            </div>
+
+                            <div class="snapshot-row">
+                                <span>Pending</span>
+                                <span class="snapshot-value value-yellow">
+                                    <span id="pendingBills">0</span>
+                                    <span class="snapshot-amount" id="pendingAmount">₹0.00</span>
+                                </span>
+                            </div>
+
+                            <div class="snapshot-row">
+                                <span>Other</span>
+                                <span class="snapshot-value value-red">
+                                    <span id="otherBills">0</span>
+                                    <span class="snapshot-amount" id="otherAmount">₹0.00</span>
+                                </span>
+                            </div>
+
+                            <div class="billing-total-row">
+                                <div class="snapshot-row">
+                                    <span class="snapshot-total">Total</span>
+                                    <span class="snapshot-total" id="totalBillingAmount">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="billing-bar">
+                                <div class="billing-collected" id="billingPaidBar"></div>
+                                <div class="billing-pending" id="billingPendingBar"></div>
+                                <div class="billing-overdue" id="billingOtherBar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PATIENT QUICK ACTIONS -->
+                    <div id="patientQuickActions" style="display:none;">
+
+                        <div class="quick-action-grid">
+
+                            <a href="/ui/appointments" class="btn btn-primary dashboard-action" data-nav-key="appointments">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                                Book Appointment
+                            </a>
+
+                            <a href="/ui/billing" class="btn dashboard-action" data-nav-key="billing">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                View Bills
+                            </a>
+
+                            <a href="/ui/medical-records" class="btn dashboard-action" data-nav-key="medical">
+                                <i class="fa-solid fa-file-medical"></i>
+                                Medical Records
+                            </a>
+
+                            <a href="/ui/doctors" class="btn dashboard-action" data-nav-key="doctors">
+                                <i class="fa-solid fa-user-doctor"></i>
+                                Find Doctor
+                            </a>
+
+                            <button type="button" class="btn dashboard-action" data-nav-key="patient-profile" onclick="togglePatientProfilePanel()">
+                                <i class="fa-solid fa-user"></i>
+                                My Profile
+                            </button>
+                        </div>
+
+                        <div class="patient-summary">
+                            <div class="snapshot-title">My Billing Summary</div>
+
+                            <div class="patient-summary-row">
+                                <span>Total Bills</span>
+                                <strong id="patientSummaryBills">0</strong>
+                            </div>
+
+                            <div class="patient-summary-row">
+                                <span>Paid</span>
+                                <strong id="patientSummaryPaid">₹0.00</strong>
+                            </div>
+
+                            <div class="patient-summary-row">
+                                <span>Pending</span>
+                                <strong id="patientSummaryPending">₹0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DOCTOR QUICK ACTIONS -->
+                    <div id="doctorQuickActions" style="display:none;">
+
+                        <div class="quick-action-grid">
+
+                            <a href="/ui/appointments" class="btn btn-primary dashboard-action" data-nav-key="appointments">
+                                <i class="fa-solid fa-calendar-check"></i>
+                                My Appointments
+                            </a>
+
+                            <a href="/ui/patients" class="btn dashboard-action" data-nav-key="patients">
+                                <i class="fa-solid fa-hospital-user"></i>
+                                My Patients
+                            </a>
+
+                            <a href="/ui/medical-records" class="btn dashboard-action" data-nav-key="medical">
+                                <i class="fa-solid fa-file-medical"></i>
+                                Medical Records
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================================================
+                 ADMIN RECENT PATIENTS
+                 ================================================= -->
+            <div class="bottom-grid" id="adminBottomGrid">
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <div class="card-title">Recent Patients</div>
+                            <div class="card-subtitle">
+                                Recently registered patients
+                            </div>
+                        </div>
+
+                        <a href="/ui/patients" class="card-link" data-nav-key="patients">View all</a>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table class="data-table">
+
+                            <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Gender</th>
+                                <th>Age</th>
+                                <th>Phone</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="patientsTable">
+                            <tr>
+                                <td colspan="4">
+                                    <div class="loading">Loading patients...</div>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <div class="card-title">Medical Staff</div>
+                            <div class="card-subtitle">
+                                Registered doctors
+                            </div>
+                        </div>
+
+                        <a href="/ui/doctors" class="card-link" data-nav-key="doctors">View all</a>
+                    </div>
+
+                    <div class="table-wrapper">
+
+                        <table class="data-table">
+
+                            <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Specialization</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="doctorsTable">
+                            <tr>
+                                <td colspan="2">
+                                    <div class="loading">Loading doctors...</div>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATIENT UPCOMING DETAIL -->
+            <div class="card" id="patientUpcomingCard" style="display:none; margin-top:20px;">
+
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Upcoming Appointment</div>
+                        <div class="card-subtitle">
+                            Your next scheduled visit
+                        </div>
+                    </div>
+
+                    <a href="/ui/appointments" class="card-link" data-nav-key="appointments">View all</a>
+                </div>
+
+                <div class="appointment-highlight" id="patientUpcomingDetail">
+                    <div class="single-message">No upcoming appointment.</div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/api.js}"></script>
+
+<script>
+    /* =========================================================
+       DASHBOARD INITIALIZATION
+       ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        initializeDate();
+
+        initializeRoleBasedDashboard();
+
+        initializeSearch();
+    });
+
+
+    let currentRole = "";
+    let currentAppointments = [];
+    let currentBills = [];
+    let currentPatientId = null;
+
+
+    /* =========================================================
+       SAFE DOM HELPERS
+       ========================================================= */
+
+    function getElement(id) {
+        return document.getElementById(id);
+    }
+
+
+    function setDisplay(id, display) {
+        const element = getElement(id);
+
+        if (element) {
+            element.style.display = display;
+        }
+    }
+
+
+    function setText(id, text) {
+        const element = getElement(id);
+
+        if (element) {
+            element.textContent = text;
+        }
+    }
+
+
+    /* =========================================================
+       DATE
+       ========================================================= */
+
+    function initializeDate() {
+
+        const element = getElement("currentDate");
+
+        if (!element) {
+            return;
+        }
+
+        const today = new Date();
+
+        element.textContent = today.toLocaleDateString(
+            "en-IN",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+    }
+
+
+    /* =========================================================
+       ROLE INITIALIZATION
+       ========================================================= */
+
+    async function initializeRoleBasedDashboard() {
+
+        currentRole =
+            normalizeRole(getCurrentRole());
+
+        console.log(
+            "Dashboard role:",
+            currentRole
+        );
+
+
+        if (currentRole === "ADMIN") {
+
+            setupAdminDashboard();
+
+            await loadAdminDashboard();
+
+            return;
+        }
+
+
+        if (currentRole === "DOCTOR") {
+
+            setupDoctorDashboard();
+
+            await loadDoctorDashboard();
+
+            return;
+        }
+
+
+        if (currentRole === "PATIENT") {
+
+            setupPatientDashboard();
+
+            await loadPatientDashboard();
+
+            return;
+        }
+
+
+        setupUnknownDashboard();
+    }
+
+
+    /* =========================================================
+       NORMALIZE ROLE
+       ========================================================= */
+
+    function normalizeRole(role) {
+
+        return String(role || "")
+            .replace(/^ROLE_/i, "")
+            .toUpperCase();
+    }
+
+
+    /* =========================================================
+       ADMIN DASHBOARD SETUP
+       ========================================================= */
+
+    function setupAdminDashboard() {
+
+        setText(
+            "welcomeDescription",
+            "Here's what's happening across your hospital today."
+        );
+
+
+        setDisplay(
+            "adminKpiGrid",
+            "grid"
+        );
+
+        setDisplay(
+            "patientKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "doctorKpiGrid",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminBottomGrid",
+            "grid"
+        );
+
+
+        setDisplay(
+            "adminAddPatientButton",
+            "inline-flex"
+        );
+
+        setDisplay(
+            "adminNewAppointmentButton",
+            "inline-flex"
+        );
+
+        setDisplay(
+            "patientBookAppointmentButton",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminBillingSnapshot",
+            "block"
+        );
+
+        setDisplay(
+            "patientQuickActions",
+            "none"
+        );
+
+        setDisplay(
+            "doctorQuickActions",
+            "none"
+        );
+
+
+        setDisplay(
+            "patientUpcomingCard",
+            "none"
+        );
+
+
+        /*
+         * Navigation
+         *
+         * These elements may not exist on every
+         * dashboard version, so setDisplay() is used.
+         */
+
+        setDisplay(
+            "patientsNav",
+            "flex"
+        );
+
+        setDisplay(
+            "doctorsNav",
+            "flex"
+        );
+
+        setDisplay(
+            "billingNav",
+            "flex"
+        );
+
+        setDisplay(
+            "reportsNav",
+            "flex"
+        );
+
+
+        /*
+         * Notification sidebar item must NOT be shown.
+         *
+         * We remove any notification navigation item,
+         * but keep the header bell.
+         */
+
+        document
+            .querySelectorAll(
+                '.sidebar [data-nav-key="notifications"]'
+            )
+            .forEach(function (element) {
+
+                element.style.display = "none";
+            });
+
+
+        /*
+         * Admin appointment table
+         */
+
+        setText(
+            "appointmentsTitle",
+            "Recent Appointments"
+        );
+
+        setText(
+            "appointmentsSubtitle",
+            "Latest appointment activity"
+        );
+
+        setText(
+            "appointmentPatientHeader",
+            "Patient"
+        );
+    }
+
+
+    /* =========================================================
+       PATIENT DASHBOARD SETUP
+       ========================================================= */
+
+    function setupPatientDashboard() {
+
+        setText(
+            "welcomeDescription",
+            "Here's an overview of your appointments, bills and medical records."
+        );
+
+
+        setDisplay(
+            "adminKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "patientKpiGrid",
+            "grid"
+        );
+
+        setDisplay(
+            "doctorKpiGrid",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminBottomGrid",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminAddPatientButton",
+            "none"
+        );
+
+        setDisplay(
+            "adminNewAppointmentButton",
+            "none"
+        );
+
+        setDisplay(
+            "patientBookAppointmentButton",
+            "inline-flex"
+        );
+
+
+        setDisplay(
+            "adminBillingSnapshot",
+            "none"
+        );
+
+        setDisplay(
+            "patientQuickActions",
+            "block"
+        );
+
+        setDisplay(
+            "doctorQuickActions",
+            "none"
+        );
+
+
+        setDisplay(
+            "patientUpcomingCard",
+            "block"
+        );
+
+
+        /*
+         * Patient should NOT see hospital-wide patients.
+         */
+
+        setDisplay(
+            "patientsNav",
+            "none"
+        );
+
+
+        /*
+         * Patient can see doctors.
+         */
+
+        setDisplay(
+            "doctorsNav",
+            "flex"
+        );
+
+
+        /*
+         * Patient can see billing.
+         */
+
+        setDisplay(
+            "billingNav",
+            "flex"
+        );
+
+
+        /*
+         * Reports are ADMIN only.
+         */
+
+        setDisplay(
+            "reportsNav",
+            "none"
+        );
+
+
+        /*
+         * Notification sidebar item hidden.
+         */
+
+        document
+            .querySelectorAll(
+                '.sidebar [data-nav-key="notifications"]'
+            )
+            .forEach(function (element) {
+
+                element.style.display = "none";
+            });
+
+
+        setText(
+            "appointmentsTitle",
+            "My Recent Appointments"
+        );
+
+        setText(
+            "appointmentsSubtitle",
+            "Your latest appointment activity"
+        );
+
+        setText(
+            "appointmentPatientHeader",
+            "Doctor"
+        );
+    }
+
+
+    /* =========================================================
+       DOCTOR DASHBOARD SETUP
+       ========================================================= */
+
+    function setupDoctorDashboard() {
+
+        setText(
+            "welcomeDescription",
+            "Here's an overview of your appointments and assigned patients."
+        );
+
+
+        setDisplay(
+            "adminKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "patientKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "doctorKpiGrid",
+            "grid"
+        );
+
+
+        setDisplay(
+            "adminBottomGrid",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminAddPatientButton",
+            "none"
+        );
+
+        setDisplay(
+            "adminNewAppointmentButton",
+            "none"
+        );
+
+        setDisplay(
+            "patientBookAppointmentButton",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminBillingSnapshot",
+            "none"
+        );
+
+        setDisplay(
+            "patientQuickActions",
+            "none"
+        );
+
+        setDisplay(
+            "doctorQuickActions",
+            "block"
+        );
+
+
+        setDisplay(
+            "patientUpcomingCard",
+            "none"
+        );
+
+
+        /*
+         * Doctor can see assigned patients.
+         */
+
+        setDisplay(
+            "patientsNav",
+            "flex"
+        );
+
+
+        /*
+         * Doctor does not need the doctor directory.
+         */
+
+        setDisplay(
+            "doctorsNav",
+            "none"
+        );
+
+
+        /*
+         * Doctor cannot access billing.
+         */
+
+        setDisplay(
+            "billingNav",
+            "none"
+        );
+
+
+        /*
+         * Reports are ADMIN only.
+         */
+
+        setDisplay(
+            "reportsNav",
+            "none"
+        );
+
+
+        /*
+         * Notification sidebar hidden.
+         */
+
+        document
+            .querySelectorAll(
+                '.sidebar [data-nav-key="notifications"]'
+            )
+            .forEach(function (element) {
+
+                element.style.display = "none";
+            });
+
+
+        setText(
+            "appointmentsTitle",
+            "My Appointments"
+        );
+
+        setText(
+            "appointmentsSubtitle",
+            "Appointments assigned to you"
+        );
+
+        setText(
+            "appointmentPatientHeader",
+            "Patient"
+        );
+    }
+
+
+    /* =========================================================
+       UNKNOWN ROLE
+       ========================================================= */
+
+    function setupUnknownDashboard() {
+
+        setDisplay(
+            "adminKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "patientKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "doctorKpiGrid",
+            "none"
+        );
+
+        setDisplay(
+            "adminBottomGrid",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminAddPatientButton",
+            "none"
+        );
+
+        setDisplay(
+            "adminNewAppointmentButton",
+            "none"
+        );
+
+        setDisplay(
+            "patientBookAppointmentButton",
+            "none"
+        );
+
+
+        setDisplay(
+            "adminBillingSnapshot",
+            "none"
+        );
+
+        setDisplay(
+            "patientQuickActions",
+            "none"
+        );
+
+        setDisplay(
+            "doctorQuickActions",
+            "none"
+        );
+
+
+        setDisplay(
+            "patientUpcomingCard",
+            "none"
+        );
+
+
+        /*
+         * Always hide notification sidebar entry.
+         */
+
+        document
+            .querySelectorAll(
+                '.sidebar [data-nav-key="notifications"]'
+            )
+            .forEach(function (element) {
+
+                element.style.display = "none";
+            });
+    }
+
+
+    /* =========================================================
+       ADMIN DASHBOARD DATA
+       ========================================================= */
+
+    async function loadAdminDashboard() {
+
+        /*
+         * Each API is loaded independently.
+         *
+         * Previously Promise.all() caused one failed
+         * request to stop every other dashboard section.
+         */
+
+        let patients = [];
+        let doctors = [];
+        let appointments = [];
+        let bills = [];
+        let medicalRecords = [];
+
+
+        /* -----------------------------------------------------
+           PATIENTS
+           ----------------------------------------------------- */
+
+        try {
+
+            const response =
+                await apiGet("/patients");
+
+            patients =
+                normalizeDashboardList(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin patients error:",
+                error
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           DOCTORS
+           ----------------------------------------------------- */
+
+        try {
+
+            const response =
+                await apiGet("/doctors");
+
+            doctors =
+                normalizeDashboardList(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin doctors error:",
+                error
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           APPOINTMENTS
+           ----------------------------------------------------- */
+
+        try {
+
+            const response =
+                await apiGet("/appointments");
+
+            appointments =
+                normalizeDashboardList(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin appointments error:",
+                error
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           BILLING
+           ----------------------------------------------------- */
+
+        try {
+        	const response =
+        	    await apiGet("/billing");
+
+        	bills =
+        	    Array.isArray(response)
+        	        ? response
+        	        : [];
+
+        } catch (error) {
+
+            console.error(
+                "Admin billing error:",
+                error
+            );
+
+            bills = [];
+        }
+
+
+        /* -----------------------------------------------------
+           MEDICAL RECORDS
+           ----------------------------------------------------- */
+
+        try {
+
+            const response =
+                await apiGet("/medicalrecords");
+
+            medicalRecords =
+                normalizeDashboardList(response);
+
+        } catch (error) {
+
+            console.error(
+                "Admin medical records error:",
+                error
+            );
+
+            medicalRecords = [];
+        }
+
+
+        /* -----------------------------------------------------
+           UPDATE STATISTICS
+           ----------------------------------------------------- */
+
+        updateAdminStatistics(
+            patients,
+            doctors,
+            appointments,
+            bills,
+            medicalRecords
+        );
+
+
+        /* -----------------------------------------------------
+           RENDER TABLES
+           ----------------------------------------------------- */
+
+        renderPatients(
+            patients
+        );
+
+        renderDoctors(
+            doctors
+        );
+
+        renderAppointments(
+            appointments
+        );
+
+        renderAdminBilling(
+            bills
+        );
+
+
+        /* -----------------------------------------------------
+           ADMIN PROFILE
+           ----------------------------------------------------- */
+
+        updateUserDisplay(
+            "Administrator",
+            "ADMIN"
+        );
+    }
+
+
+    /* =========================================================
+       NORMALIZE ADMIN DASHBOARD LISTS
+       ========================================================= */
+
+    function normalizeDashboardList(response) {
+
+        if (Array.isArray(response)) {
+            return response;
+        }
+
+
+        if (
+            response &&
+            Array.isArray(response.content)
+        ) {
+            return response.content;
+        }
+
+
+        /*
+         * Do not treat arbitrary objects as
+         * a list of multiple records.
+         */
+
+        return [];
+    }
+
+
+    /* =========================================================
+       DOCTOR DASHBOARD DATA
+       ========================================================= */
+
+    async function loadDoctorDashboard() {
+
+        try {
+
+            /*
+             * This endpoint returns the logged-in
+             * doctor's profile.
+             */
+
+            const doctor =
+                await apiGet("/doctors/me");
+
+
+            const appointments =
+                await apiGet("/appointments");
+
+
+            currentAppointments =
+                Array.isArray(appointments)
+                    ? appointments
+                    : [];
+
+
+            updateUserDisplay(
+                doctor?.name || "Doctor",
+                "DOCTOR"
+            );
+
+
+            const uniquePatientIds =
+                new Set(
+                    currentAppointments
+                        .map(
+                            appointment =>
+                                appointment
+                                    ?.patient
+                                    ?.id
+                        )
+                        .filter(
+                            id =>
+                                id !== null &&
+                                id !== undefined
+                        )
+                );
+
+
+            const now =
+                new Date();
+
+
+            const upcoming =
+                currentAppointments.filter(
+                    function (appointment) {
+
+                        const date =
+                            new Date(
+                                appointment.appointmentTime
+                            );
+
+                        return (
+                            !isNaN(
+                                date.getTime()
+                            ) &&
+                            date >= now &&
+                            String(
+                                appointment.status || ""
+                            ).toLowerCase() !==
+                                "cancelled"
+                        );
+                    }
+                );
+
+
+            setText(
+                "doctorAppointmentCount",
+                currentAppointments.length
+            );
+
+            setText(
+                "doctorPatientCount",
+                uniquePatientIds.size
+            );
+
+            setText(
+                "doctorUpcomingCount",
+                upcoming.length
+            );
+
+            setText(
+                "appointmentBadge",
+                currentAppointments.length
+            );
+
+
+            renderAppointments(
+                currentAppointments
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Doctor dashboard error:",
+                error
+            );
+
+
+            updateUserDisplay(
+                getCurrentUsername() || "Doctor",
+                "DOCTOR"
+            );
+
+
+            showTableMessage(
+                "appointmentsTable",
+                4,
+                "Unable to load your appointments."
+            );
+        }
+    }
+
+
+    /* =========================================================
+       PATIENT DASHBOARD DATA
+       ========================================================= */
+
+       async function loadPatientDashboard() {
+
+    	    let patient = null;
+    	    let appointments = [];
+    	    let bills = [];
+
+    	    /* =====================================================
+    	       LOAD PATIENT PROFILE DIRECTLY
+    	       ===================================================== */
+
+    	    try {
+
+    	        patient = await apiGet("/patients/me");
+
+    	        if (!patient) {
+    	            throw new Error("Patient profile not found.");
+    	        }
+
+    	        currentPatientId = patient.id || null;
+
+    	        updateUserDisplay(
+    	            patient.name || getCurrentUsername() || "Patient",
+    	            "PATIENT"
+    	        );
+
+    	    } catch (error) {
+
+    	        console.error(
+    	            "Patient profile error:",
+    	            error
+    	        );
+
+    	        currentPatientId = null;
+
+    	        updateUserDisplay(
+    	            getCurrentUsername() || "Patient",
+    	            "PATIENT"
+    	        );
+    	    }
+
+
+    	    /* =====================================================
+    	       LOAD PATIENT APPOINTMENTS
+    	       ===================================================== */
+
+    	    try {
+
+    	        appointments =
+    	            await apiGet("/appointments");
+
+    	        currentAppointments =
+    	            Array.isArray(appointments)
+    	                ? appointments
+    	                : [];
+
+    	    } catch (error) {
+
+    	        console.warn(
+    	            "Patient appointments unavailable:",
+    	            error
+    	        );
+
+    	        currentAppointments = [];
+    	    }
+
+
+    	    /* =====================================================
+    	       LOAD PATIENT BILLING
+    	       ===================================================== */
+
+    	    try {
+
+    	        bills =
+    	            normalizeBilling(
+    	                await apiGet("/billing/me")
+    	            );
+
+    	        if (!Array.isArray(bills)) {
+    	            bills = [];
+    	        }
+
+    	    } catch (error) {
+
+    	        console.warn(
+    	            "Patient billing unavailable:",
+    	            error
+    	        );
+
+    	        bills = [];
+    	    }
+
+
+    	    currentBills = bills;
+
+
+    	    /* =====================================================
+    	       UPDATE APPOINTMENT COUNT
+    	       ===================================================== */
+
+    	    setText(
+    	        "patientAppointmentCount",
+    	        currentAppointments.length
+    	    );
+
+    	    setText(
+    	        "appointmentBadge",
+    	        currentAppointments.length
+    	    );
+
+
+    	    /* =====================================================
+    	       UPDATE BILL COUNT
+    	       ===================================================== */
+
+    	    setText(
+    	        "patientBillCount",
+    	        bills.length
+    	    );
+
+
+    	    /* =====================================================
+    	       RENDER PATIENT DATA
+    	       ===================================================== */
+
+    	    renderPatientBillingSummary(
+    	        bills
+    	    );
+
+    	    renderPatientAppointments(
+    	        currentAppointments
+    	    );
+
+
+    	    /* =====================================================
+    	       LOAD MEDICAL RECORD COUNT
+    	       ===================================================== */
+
+    	    await loadPatientMedicalRecords();
+    	}
+    /* =========================================================
+       PATIENT MEDICAL RECORDS
+       ========================================================= */
+
+    async function loadPatientMedicalRecords() {
+
+        try {
+
+            const records =
+                await apiGet("/medicalrecords/me");
+
+            setText(
+                "patientRecordCount",
+                Array.isArray(records)
+                    ? records.length
+                    : 0
+            );
+
+        } catch (error) {
+
+            console.warn(
+                "Medical records unavailable:",
+                error
+            );
+
+            setText(
+                "patientRecordCount",
+                "0"
+            );
+        }
+    }
+
+    /* =========================================================
+       UPDATE USER DISPLAY
+       ========================================================= */
+
+    function updateUserDisplay(
+        name,
+        role
+    ) {
+
+        const safeName =
+            name ||
+            getCurrentUsername() ||
+            "User";
+
+
+        setText(
+            "profileName",
+            safeName
+        );
+
+
+        setText(
+            "welcomeName",
+            safeName
+        );
+
+
+        const avatar =
+            getElement("profileAvatar");
+
+        if (avatar) {
+
+            avatar.textContent =
+                safeName
+                    .substring(0, 1)
+                    .toUpperCase();
+        }
+
+
+        let displayRole =
+            String(
+                role || "USER"
+            )
+                .replace(
+                    "ROLE_",
+                    ""
+                )
+                .toLowerCase();
+
+
+        displayRole =
+            displayRole.charAt(0)
+                .toUpperCase() +
+            displayRole.substring(1);
+
+
+        setText(
+            "profileRole",
+            displayRole
+        );
+    }
+
+
+    /* =========================================================
+       ADMIN STATISTICS
+       ========================================================= */
+
+    function updateAdminStatistics(
+        patients,
+        doctors,
+        appointments,
+        bills,
+        medicalRecords
+    ) {
+
+        setText(
+            "totalPatients",
+            Array.isArray(patients)
+                ? patients.length
+                : 0
+        );
+
+
+        setText(
+            "totalDoctors",
+            Array.isArray(doctors)
+                ? doctors.length
+                : 0
+        );
+
+
+        setText(
+            "totalAppointments",
+            Array.isArray(appointments)
+                ? appointments.length
+                : 0
+        );
+
+
+        setText(
+            "totalBills",
+            Array.isArray(bills)
+                ? bills.length
+                : 0
+        );
+
+
+        setText(
+            "totalMedicalRecords",
+            Array.isArray(medicalRecords)
+                ? medicalRecords.length
+                : 0
+        );
+
+
+        setText(
+            "appointmentBadge",
+            Array.isArray(appointments)
+                ? appointments.length
+                : 0
+        );
+    }
+
+
+    /* =========================================================
+       PATIENT TABLE
+       ========================================================= */
+
+    function renderPatients(
+        patients
+    ) {
+
+        const table =
+            getElement(
+                "patientsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML = "";
+
+
+        if (
+            !Array.isArray(patients) ||
+            patients.length === 0
+        ) {
+
+            showTableMessage(
+                "patientsTable",
+                4,
+                "No patients found."
+            );
+
+            return;
+        }
+
+
+        patients
+            .slice(0, 5)
+            .forEach(
+                function (patient) {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+                        <td>
+                            <span class="patient-name">
+                                ${escapeHtml(
+                                    patient.name ||
+                                    "Unknown"
+                                )}
+                            </span>
+
+                            <span class="patient-id">
+                                ID:
+                                ${patient.id ?? "--"}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                patient.gender ||
+                                "--"
+                            )}
+                        </td>
+
+                        <td>
+                            ${patient.age ?? "--"}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                patient.phone ||
+                                "--"
+                            )}
+                        </td>
+                    `;
+
+
+                    table.appendChild(
+                        row
+                    );
+                }
+            );
+    }
+
+
+    /* =========================================================
+       DOCTOR TABLE
+       ========================================================= */
+
+    function renderDoctors(
+        doctors
+    ) {
+
+        const table =
+            getElement(
+                "doctorsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML = "";
+
+
+        if (
+            !Array.isArray(doctors) ||
+            doctors.length === 0
+        ) {
+
+            showTableMessage(
+                "doctorsTable",
+                2,
+                "No doctors found."
+            );
+
+            return;
+        }
+
+
+        doctors
+            .slice(0, 5)
+            .forEach(
+                function (doctor) {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+                        <td>
+                            ${escapeHtml(
+                                doctor.name ||
+                                "Unknown"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                doctor.specialization ||
+                                "--"
+                            )}
+                        </td>
+                    `;
+
+
+                    table.appendChild(
+                        row
+                    );
+                }
+            );
+    }
+
+
+    /* =========================================================
+       SEARCH
+       ========================================================= */
+
+    function initializeSearch() {
+
+        /*
+         * Keep the existing search initialization
+         * if another implementation already exists.
+         *
+         * This guard prevents a missing search element
+         * from breaking the dashboard.
+         */
+
+        const searchInput =
+            getElement(
+                "dashboardSearch"
+            );
+
+        if (!searchInput) {
+            return;
+        }
+    }
+
+
+    /* =========================================================
+       REMOVE NOTIFICATION SIDEBAR ITEMS
+       ========================================================= */
+
+    function removeNotificationSidebarItems() {
+
+        document
+            .querySelectorAll(
+                '[data-nav-key="notifications"]'
+            )
+            .forEach(
+                function (element) {
+
+                    /*
+                     * Do not remove the header
+                     * notification bell.
+                     */
+
+                    if (
+                        element.closest(
+                            ".sidebar"
+                        )
+                    ) {
+
+                        element.remove();
+                    }
+                }
+            );
+    }
+
+
+    /*
+     * Run this once after the page loads.
+     */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            removeNotificationSidebarItems();
+
+        }
+    );
+</script>
+
+</body>
+</html>

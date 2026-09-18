@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Patient Form | Hospital Management System</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        .form-card {
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .form-subtitle {
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .form-body {
+            padding: 25px;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 17px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .form-control {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            background: #fff;
+            color: #111827;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+        }
+
+        .form-help {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .message {
+            display: none;
+            margin-bottom: 18px;
+            padding: 11px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .message.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .message.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #166534;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .primary-button,
+        .secondary-button {
+            border: 0;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .primary-button {
+            padding: 11px 17px;
+            border-radius: 9px;
+            background: #2563eb;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .primary-button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-button {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .secondary-button:hover {
+            background: #e5e7eb;
+        }
+
+        .required-note {
+            margin-top: 5px;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        @media (max-width: 700px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .form-header {
+                align-items: flex-start;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions a,
+            .form-actions button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>
+                    Patients
+                </span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>
+                    Doctors
+                </span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>
+                    Appointments
+                </span>
+
+            </a>
+
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>
+                    Medical Records
+                </span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>
+                    Billing
+                </span>
+
+            </a>
+
+
+            <div class="nav-section-title system-section">
+                System
+            </div>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Reports')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+
+                <span>
+                    Reports
+                </span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Settings')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- HEADER -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1 id="pageTitle">
+                    Add Patient
+                </h1>
+
+                <p id="currentDate">
+                    Patient management
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="text"
+                           placeholder="Search patients, doctors...">
+
+                </div>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+                        A
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+                            Admin
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+                            Administrator
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             CONTENT
+             ===================================================== -->
+
+        <section class="page-content">
+
+
+            <div class="card form-card">
+
+
+                <!-- HEADER -->
+
+                <div class="card-header">
+
+                    <div class="form-header">
+
+                        <div>
+
+                            <div class="form-title"
+                                 id="formTitle">
+
+                                Add Patient
+
+                            </div>
+
+
+                            <div class="form-subtitle"
+                                 id="formSubtitle">
+
+                                Register a new patient in the hospital system
+
+                            </div>
+
+                        </div>
+
+
+                        <a href="/ui/patients"
+                           class="secondary-button">
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                            Back
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FORM BODY -->
+
+                <div class="form-body">
+
+
+                    <!-- ERROR -->
+
+                    <div id="errorMessage"
+                         class="message error">
+                    </div>
+
+
+                    <!-- SUCCESS -->
+
+                    <div id="successMessage"
+                         class="message success">
+                    </div>
+
+
+
+                    <form id="patientForm"
+                          novalidate>
+
+
+                        <!-- =================================================
+                             BASIC INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section">
+
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                Basic Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- NAME -->
+
+                                <div class="form-group full">
+
+                                    <label for="patientName">
+
+                                        Full Name
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="patientName"
+                                        class="form-control"
+                                        placeholder="Enter patient's full name"
+                                        maxlength="100"
+                                        required>
+
+
+                                    <span class="form-help">
+
+                                        Enter the patient's full name.
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- AGE -->
+
+                                <div class="form-group">
+
+                                    <label for="patientAge">
+
+                                        Age
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="number"
+                                        id="patientAge"
+                                        class="form-control"
+                                        placeholder="Enter age"
+                                        min="0"
+                                        max="150"
+                                        required>
+
+                                </div>
+
+
+
+                                <!-- GENDER -->
+
+                                <div class="form-group">
+
+                                    <label for="patientGender">
+
+                                        Gender
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        id="patientGender"
+                                        class="form-control"
+                                        required>
+
+                                        <option value="">
+                                            Select gender
+                                        </option>
+
+                                        <option value="Male">
+                                            Male
+                                        </option>
+
+                                        <option value="Female">
+                                            Female
+                                        </option>
+
+                                        <option value="Other">
+                                            Other
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             CONTACT INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section">
+
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-address-book"></i>
+
+                                Contact Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- PHONE -->
+
+                                <div class="form-group">
+
+                                    <label for="patientPhone">
+
+                                        Phone
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="tel"
+                                        id="patientPhone"
+                                        class="form-control"
+                                        placeholder="Enter phone number"
+                                        maxlength="15"
+                                        required>
+
+                                </div>
+
+
+
+                                <!-- EMAIL -->
+
+                                <div class="form-group">
+
+                                    <label for="patientEmail">
+
+                                        Email
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="email"
+                                        id="patientEmail"
+                                        class="form-control"
+                                        placeholder="Enter email address"
+                                        maxlength="150"
+                                        required>
+
+                                </div>
+
+
+
+                                <!-- ADDRESS -->
+
+                                <div class="form-group full">
+
+                                    <label for="patientAddress">
+
+                                        Address
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <textarea
+                                        id="patientAddress"
+                                        class="form-control"
+                                        placeholder="Enter patient's complete address"
+                                        rows="4"
+                                        maxlength="300"
+                                        required></textarea>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+
+
+                        <!-- =================================================
+                             LOGIN INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section" id="loginSection">
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-lock"></i>
+
+                                Login Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- USERNAME -->
+
+                                <div class="form-group">
+
+                                    <label for="patientUsername">
+
+                                        Username
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="patientUsername"
+                                        class="form-control"
+                                        placeholder="Create username"
+                                        maxlength="50">
+
+                                    <span class="form-help">
+
+                                        Username used by the patient to log in.
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- PASSWORD -->
+
+                                <div class="form-group">
+
+                                    <label for="patientPassword">
+
+                                        Password
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="password"
+                                        id="patientPassword"
+                                        class="form-control"
+                                        placeholder="Create password"
+                                        minlength="6"
+                                        maxlength="100">
+
+                                    <span class="form-help">
+
+                                        Password must be at least 6 characters.
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- CONFIRM PASSWORD -->
+
+                                <div class="form-group">
+
+                                    <label for="patientConfirmPassword">
+
+                                        Confirm Password
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="password"
+                                        id="patientConfirmPassword"
+                                        class="form-control"
+                                        placeholder="Confirm password"
+                                        minlength="6"
+                                        maxlength="100">
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="required-note">
+
+                            <span class="required">*</span>
+
+                            Required fields
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             ACTIONS
+                             ================================================= -->
+
+                        <div class="form-actions">
+
+
+                            <a href="/ui/patients"
+                               class="secondary-button">
+
+                                Cancel
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                id="savePatientButton"
+                                class="primary-button">
+
+                                <i class="fa-solid fa-user-plus"></i>
+
+                                Save Patient
+
+                            </button>
+
+
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<script th:src="@{/js/api.js}"></script>
+
+
+
+<script>
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
+    let editingPatientId = null;
+
+    let editMode = false;
+
+
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async function () {
+
+            initializeDate();
+
+            initializeProfile();
+
+            determineMode();
+
+
+            document
+                .getElementById("patientForm")
+                .addEventListener(
+                    "submit",
+                    savePatient
+                );
+
+        }
+    );
+
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
+
+    function initializeDate() {
+
+        document.getElementById(
+            "currentDate"
+        ).textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+
+    }
+
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function initializeProfile() {
+
+        const username =
+            typeof getCurrentUsername === "function"
+                ? getCurrentUsername()
+                : null;
+
+
+        const role =
+            typeof getCurrentRole === "function"
+                ? getCurrentRole()
+                : null;
+
+
+        if (username) {
+
+            document.getElementById(
+                "profileName"
+            ).textContent =
+                username;
+
+
+            document.getElementById(
+                "profileAvatar"
+            ).textContent =
+                username
+                    .substring(
+                        0,
+                        1
+                    )
+                    .toUpperCase();
+
+        }
+
+
+        if (role) {
+
+            let displayRole =
+                role
+                    .replace(
+                        "ROLE_",
+                        ""
+                    )
+                    .toLowerCase();
+
+
+            displayRole =
+                displayRole
+                    .charAt(0)
+                    .toUpperCase()
+                    +
+                    displayRole.substring(1);
+
+
+            document.getElementById(
+                "profileRole"
+            ).textContent =
+                displayRole;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // DETERMINE ADD / EDIT
+    // =========================================================
+
+    async function determineMode() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        const id =
+            params.get("id");
+
+
+        if (id) {
+
+            editMode = true;
+
+            editingPatientId = id;
+
+            setupEditMode();
+
+            await loadPatient(id);
+
+        }
+
+        else {
+
+            editMode = false;
+
+            setupAddMode();
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ADD MODE
+    // =========================================================
+
+    function setupAddMode() {
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "Add Patient";
+
+
+        document.getElementById(
+            "formTitle"
+        ).textContent =
+            "Add Patient";
+
+
+        document.getElementById(
+            "formSubtitle"
+        ).textContent =
+            "Register a new patient in the hospital system";
+
+
+        document.getElementById(
+            "savePatientButton"
+        ).innerHTML = `
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Save Patient
+
+        `;
+
+
+        document.getElementById("loginSection").style.display = "block";
+
+        document.getElementById("patientUsername").required = true;
+        document.getElementById("patientPassword").required = true;
+        document.getElementById("patientConfirmPassword").required = true;
+
+    }
+
+
+
+    // =========================================================
+    // EDIT MODE
+    // =========================================================
+
+    function setupEditMode() {
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "Edit Patient";
+
+
+        document.getElementById(
+            "formTitle"
+        ).textContent =
+            "Edit Patient";
+
+
+        document.getElementById(
+            "formSubtitle"
+        ).textContent =
+            "Update the patient's information";
+
+
+        document.getElementById(
+            "savePatientButton"
+        ).innerHTML = `
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Update Patient
+
+        `;
+
+
+        document.getElementById("loginSection").style.display = "none";
+
+        document.getElementById("patientUsername").required = false;
+        document.getElementById("patientPassword").required = false;
+        document.getElementById("patientConfirmPassword").required = false;
+
+    }
+
+
+
+    // =========================================================
+    // LOAD PATIENT FOR EDIT
+    // =========================================================
+
+    async function loadPatient(id) {
+
+        try {
+
+            const patient =
+                await apiGet(
+                    "/patients/" + id
+                );
+
+
+            if (!patient) {
+
+                showError(
+                    "Patient was not found."
+                );
+
+                return;
+
+            }
+
+
+            document.getElementById(
+                "patientName"
+            ).value =
+                patient.name || "";
+
+
+            document.getElementById(
+                "patientAge"
+            ).value =
+                patient.age ?? "";
+
+
+            document.getElementById(
+                "patientGender"
+            ).value =
+                patient.gender || "";
+
+
+            document.getElementById(
+                "patientPhone"
+            ).value =
+                patient.phone || "";
+
+
+            document.getElementById(
+                "patientEmail"
+            ).value =
+                patient.email || "";
+
+
+            document.getElementById(
+                "patientAddress"
+            ).value =
+                patient.address || "";
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Failed to load patient:",
+                error
+            );
+
+
+            showError(
+                error.message
+                ||
+                "Unable to load patient details."
+            );
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // SAVE / UPDATE
+    // =========================================================
+
+    async function savePatient(event) {
+
+        event.preventDefault();
+
+        hideMessages();
+
+
+        const name =
+            document.getElementById(
+                "patientName"
+            ).value.trim();
+
+
+        const ageValue =
+            document.getElementById(
+                "patientAge"
+            ).value;
+
+
+        const gender =
+            document.getElementById(
+                "patientGender"
+            ).value;
+
+
+        const phone =
+            document.getElementById(
+                "patientPhone"
+            ).value.trim();
+
+
+        const email =
+            document.getElementById(
+                "patientEmail"
+            ).value.trim();
+
+
+        const address =
+            document.getElementById(
+                "patientAddress"
+            ).value.trim();
+
+
+
+        // =====================================================
+        // VALIDATION
+        // =====================================================
+
+        if (!name) {
+
+            showError(
+                "Please enter the patient's name."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            ageValue === ""
+            ||
+            !Number.isInteger(
+                Number(ageValue)
+            )
+            ||
+            Number(ageValue) < 0
+            ||
+            Number(ageValue) > 150
+        ) {
+
+            showError(
+                "Please enter a valid age."
+            );
+
+            return;
+
+        }
+
+
+        if (!gender) {
+
+            showError(
+                "Please select the patient's gender."
+            );
+
+            return;
+
+        }
+
+
+        if (!phone) {
+
+            showError(
+                "Please enter the patient's phone number."
+            );
+
+            return;
+
+        }
+
+
+        if (!email) {
+
+            showError(
+                "Please enter the patient's email address."
+            );
+
+            return;
+
+        }
+
+
+        if (!isValidEmail(email)) {
+
+            showError(
+                "Please enter a valid email address."
+            );
+
+            return;
+
+        }
+
+
+        if (!address) {
+
+            showError(
+                "Please enter the patient's address."
+            );
+
+            return;
+
+        }
+
+
+
+        const data = {
+
+            name: name,
+
+            age: Number(ageValue),
+
+            gender: gender,
+
+            phone: phone,
+
+            email: email,
+
+            address: address
+
+        };
+
+
+        const button =
+            document.getElementById(
+                "savePatientButton"
+            );
+
+
+        button.disabled = true;
+
+
+        button.innerHTML = `
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            ${editMode ? "Updating..." : "Saving..."}
+
+        `;
+
+
+        try {
+
+            // =================================================
+            // UPDATE
+            // =================================================
+
+            if (editMode) {
+
+                await apiPut(
+                    "/patients/"
+                    +
+                    editingPatientId,
+                    data
+                );
+
+
+                showSuccess(
+                    "Patient updated successfully."
+                );
+
+            }
+
+
+            // =================================================
+            // CREATE
+            // =================================================
+
+            else {
+
+                const username =
+                    document.getElementById(
+                        "patientUsername"
+                    ).value.trim();
+
+                const password =
+                    document.getElementById(
+                        "patientPassword"
+                    ).value;
+
+                const confirmPassword =
+                    document.getElementById(
+                        "patientConfirmPassword"
+                    ).value;
+
+
+                if (!username) {
+
+                    showError(
+                        "Please enter a username."
+                    );
+
+                    return;
+
+                }
+
+
+                if (username.length < 3) {
+
+                    showError(
+                        "Username must be at least 3 characters."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!password) {
+
+                    showError(
+                        "Please enter a password."
+                    );
+
+                    return;
+
+                }
+
+
+                if (password.length < 6) {
+
+                    showError(
+                        "Password must be at least 6 characters."
+                    );
+
+                    return;
+
+                }
+
+
+                if (password !== confirmPassword) {
+
+                    showError(
+                        "Passwords do not match."
+                    );
+
+                    return;
+
+                }
+
+
+                const accountData = {
+
+                    patient: data,
+
+                    username: username,
+
+                    password: password
+
+                };
+
+
+                await apiPost(
+                    "/patients",
+                    accountData
+                );
+
+
+                showSuccess(
+                    "Patient and login account created successfully."
+                );
+
+            }
+
+
+            setTimeout(
+                function () {
+
+                    window.location.href =
+                        "/ui/patients";
+
+                },
+                1000
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Patient save error:",
+                error
+            );
+
+
+            showError(
+                error.message
+                ||
+                (
+                    editMode
+                        ? "Unable to update patient."
+                        : "Unable to add patient."
+                )
+            );
+
+        }
+
+        finally {
+
+            button.disabled = false;
+
+
+            button.innerHTML =
+                editMode
+
+                ? `
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Update Patient
+
+                  `
+
+                : `
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Save Patient
+
+                  `;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // EMAIL
+    // =========================================================
+
+    function isValidEmail(
+        email
+    ) {
+
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            .test(email);
+
+    }
+
+
+
+    // =========================================================
+    // ERROR MESSAGE
+    // =========================================================
+
+    function showError(
+        message
+    ) {
+
+        const element =
+            document.getElementById(
+                "errorMessage"
+            );
+
+
+        element.textContent =
+            message;
+
+
+        element.classList.add(
+            "show"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // SUCCESS MESSAGE
+    // =========================================================
+
+    function showSuccess(
+        message
+    ) {
+
+        const element =
+            document.getElementById(
+                "successMessage"
+            );
+
+
+        element.textContent =
+            message;
+
+
+        element.classList.add(
+            "show"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // HIDE MESSAGES
+    // =========================================================
+
+    function hideMessages() {
+
+        document
+            .getElementById(
+                "errorMessage"
+            )
+            .classList
+            .remove(
+                "show"
+            );
+
+
+        document
+            .getElementById(
+                "successMessage"
+            )
+            .classList
+            .remove(
+                "show"
+            );
+
+    }
+
+
+
+    // =========================================================
+    // COMING SOON
+    // =========================================================
+
+    function showComingSoon(
+        event,
+        feature
+    ) {
+
+        event.preventDefault();
+
+        alert(
+            feature
+            +
+            " will be available in a later step."
+        );
+
+    }
+
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+        localStorage.removeItem(
+            "jwtToken"
+        );
+
+        localStorage.removeItem(
+            "token"
+        );
+
+        localStorage.removeItem(
+            "accessToken"
+        );
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

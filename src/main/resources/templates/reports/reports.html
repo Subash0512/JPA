@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Reports | Hospital Management System</title>
+
+    <!-- Main HMS CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* =====================================================
+           REPORTS PAGE LAYOUT FIX
+           ===================================================== */
+
+        .reports-main {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            min-height: 100vh;
+            box-sizing: border-box;
+            background: #f5f8fb;
+        }
+
+
+        .reports-page {
+            padding: 28px;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .reports-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 16px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .reports-header h1 {
+
+            margin: 0;
+
+            font-size: 26px;
+
+            font-weight: 700;
+
+            color: #102a43;
+        }
+
+
+        .reports-subtitle {
+
+            color: #64748b;
+
+            margin-top: 6px;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           REFRESH BUTTON
+           ===================================================== */
+
+        .refresh-btn {
+
+            border: 1px solid #cbd5e1;
+
+            background: #ffffff;
+
+            color: #102a43;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .refresh-btn:hover {
+
+            background: #f8fafc;
+
+            border-color: #94a3b8;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           KPI GRID
+           ===================================================== */
+
+        .report-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 16px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .report-card {
+
+            background: #ffffff;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            box-shadow:
+                0 2px 8px rgba(15, 23, 42, 0.04);
+
+            min-width: 0;
+
+            box-sizing: border-box;
+        }
+
+
+        .report-card .icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #f1f5f9;
+
+            color: #164e63;
+
+            margin-bottom: 12px;
+        }
+
+
+        .report-card .value {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+            margin: 4px 0;
+
+            color: #102a43;
+
+            word-break: break-word;
+        }
+
+
+        .report-card .label {
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           REPORT SECTIONS
+           ===================================================== */
+
+        .report-section {
+
+            background: #ffffff;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            margin-bottom: 20px;
+
+            overflow-x: auto;
+
+            box-sizing: border-box;
+
+            box-shadow:
+                0 2px 8px rgba(15, 23, 42, 0.03);
+        }
+
+
+        .report-section h2 {
+
+            margin: 0 0 16px;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color: #102a43;
+        }
+
+
+        /* =====================================================
+           REPORT TABLE
+           ===================================================== */
+
+        .report-table {
+
+            width: 100%;
+
+            min-width: 650px;
+
+            border-collapse: collapse;
+        }
+
+
+        .report-table th,
+        .report-table td {
+
+            padding: 11px 10px;
+
+            border-bottom:
+                1px solid #e2e8f0;
+
+            text-align: left;
+
+            font-size: 14px;
+
+            white-space: nowrap;
+        }
+
+
+        .report-table th {
+
+            color: #475569;
+
+            font-weight: 700;
+
+            background: #f8fafc;
+        }
+
+
+        .report-table tbody tr:hover {
+
+            background: #f8fafc;
+        }
+
+
+        .report-table tbody tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 4px 9px;
+
+            border-radius: 999px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .status-paid {
+
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+
+        .status-pending {
+
+            background: #fef3c7;
+
+            color: #92400e;
+        }
+
+
+        /* =====================================================
+           EMPTY / ERROR
+           ===================================================== */
+
+        .empty,
+        .error {
+
+            padding: 28px;
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+
+        .error {
+
+            color: #b91c1c;
+        }
+
+
+        /* =====================================================
+           LOADING
+           ===================================================== */
+
+        .loading {
+
+            padding: 30px;
+
+            text-align: center;
+
+            color: #64748b;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1200px) {
+
+            .report-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+
+        @media (max-width: 900px) {
+
+            .reports-main {
+
+                margin-left: 0;
+
+                width: 100%;
+            }
+        }
+
+
+        @media (max-width: 700px) {
+
+            .reports-page {
+
+                padding: 16px;
+            }
+
+
+            .report-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .reports-header {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+
+            .refresh-btn {
+
+                width: 100%;
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE TABLE
+           ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .report-section {
+
+                padding: 15px;
+            }
+
+
+            .report-card {
+
+                padding: 16px;
+            }
+
+
+            .report-table {
+
+                min-width: 600px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     APPLICATION LAYOUT
+     ========================================================= -->
+
+<div class="app-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- BRAND -->
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+
+                <i class="fa-solid fa-plus"></i>
+
+            </div>
+
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SIDEBAR CONTENT -->
+        <div class="sidebar-content">
+
+
+            <!-- MAIN -->
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item"
+               data-nav-key="dashboard">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item"
+               data-nav-key="patients">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-hospital-user"></i>
+
+                </span>
+
+                <span>
+                    Patients
+                </span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               class="nav-item"
+               data-nav-key="doctors">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-user-doctor"></i>
+
+                </span>
+
+                <span>
+                    Doctors
+                </span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item"
+               data-nav-key="appointments">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                </span>
+
+                <span>
+                    Appointments
+                </span>
+
+            </a>
+
+
+            <!-- CLINICAL -->
+            <div class="nav-section-title">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item"
+               data-nav-key="medical">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-file-medical"></i>
+
+                </span>
+
+                <span>
+                    Medical Records
+                </span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item"
+               data-nav-key="billing">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+
+                </span>
+
+                <span>
+                    Billing
+                </span>
+
+            </a>
+
+
+            <!-- SYSTEM -->
+            <div class="nav-section-title">
+                System
+            </div>
+
+
+            <!-- REPORTS -->
+            <a href="/ui/reports"
+               class="nav-item active"
+               data-nav-key="reports">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-chart-column"></i>
+
+                </span>
+
+                <span>
+                    Reports
+                </span>
+
+            </a>
+
+
+            <!-- STAFF -->
+            <a href="/ui/staff"
+               class="nav-item"
+               data-nav-key="staff">
+
+                <span class="nav-icon">
+
+                    <i class="fa-solid fa-users-gear"></i>
+
+                </span>
+
+                <span>
+                    Staff Accounts
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- SIDEBAR FOOTER -->
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="reports-main">
+
+
+        <div class="reports-page">
+
+
+            <!-- =================================================
+                 REPORT HEADER
+                 ================================================= -->
+
+            <div class="reports-header">
+
+
+                <div>
+
+                    <h1>
+                        Reports
+                    </h1>
+
+
+                    <div
+                        class="reports-subtitle"
+                        id="reportSubtitle">
+
+                        Hospital overview and
+                        activity summary
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="refresh-btn"
+                    onclick="loadReports()">
+
+                    <i class="fa-solid fa-rotate"></i>
+
+                    Refresh
+
+                </button>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 MESSAGE
+                 ================================================= -->
+
+            <div
+                id="message"
+                class="report-section"
+                style="display: none;">
+
+            </div>
+
+
+            <!-- =================================================
+                 REPORT CONTENT
+                 ================================================= -->
+
+            <div
+                id="reportContent"
+                style="display: none;">
+
+
+                <!-- =================================================
+                     KPI CARDS
+                     ================================================= -->
+
+                <div
+                    class="report-grid"
+                    id="cards">
+
+                </div>
+
+
+                <!-- =================================================
+                     BILLING SUMMARY
+                     ================================================= -->
+
+                <div
+                    class="report-section"
+                    id="financeSection"
+                    style="display: none;">
+
+
+                    <h2>
+                        Billing Summary
+                    </h2>
+
+
+                    <table class="report-table">
+
+
+                        <thead>
+
+                        <tr>
+
+                            <th>
+                                Metric
+                            </th>
+
+                            <th>
+                                Value
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="financeBody">
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     RECENT APPOINTMENTS
+                     ================================================= -->
+
+                <div class="report-section">
+
+
+                    <h2>
+                        Recent Appointments
+                    </h2>
+
+
+                    <div
+                        id="appointmentsTable">
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     MEDICAL RECORDS
+                     ================================================= -->
+
+                <div
+                    class="report-section"
+                    id="recordsSection"
+                    style="display: none;">
+
+
+                    <h2>
+                        Recent Medical Records
+                    </h2>
+
+
+                    <div
+                        id="recordsTable">
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+<!-- =========================================================
+     API JS
+     ========================================================= -->
+
+<script th:src="@{/js/api.js}"></script>
+
+
+<script>
+
+
+/* =========================================================
+   ROLE
+   ========================================================= */
+
+const role =
+    String(
+        localStorage.getItem("role") || ""
+    )
+    .replace(/^ROLE_/i, "")
+    .toUpperCase();
+
+
+console.log(
+    "Reports role:",
+    role
+);
+
+
+/* =========================================================
+   HELPER FUNCTIONS
+   ========================================================= */
+
+function normalize(value) {
+
+    return Array.isArray(value)
+        ? value
+        : [];
+}
+
+
+function patientIdOf(item) {
+
+    return (
+        item?.patient?.id ??
+        item?.patientId ??
+        null
+    );
+}
+
+
+function doctorIdOf(item) {
+
+    return (
+        item?.doctor?.id ??
+        item?.doctorId ??
+        null
+    );
+}
+
+
+function patientNameOf(item) {
+
+    return (
+        item?.patient?.name ??
+        item?.patientName ??
+        "—"
+    );
+}
+
+
+function doctorNameOf(item) {
+
+    return (
+        item?.doctor?.name ??
+        item?.doctorName ??
+        "—"
+    );
+}
+
+
+function money(value) {
+
+    return (
+        "₹" +
+        Number(value || 0)
+            .toLocaleString(
+                "en-IN",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            )
+    );
+}
+
+
+function dateText(value) {
+
+    if (!value) {
+        return "—";
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return String(value);
+    }
+
+
+    return date.toLocaleString(
+        "en-IN"
+    );
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+function showError(message) {
+
+    const box =
+        document.getElementById(
+            "message"
+        );
+
+
+    box.style.display =
+        "block";
+
+
+    box.className =
+        "report-section error";
+
+
+    box.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation"></i>
+        ${message}
+    `;
+
+
+    document.getElementById(
+        "reportContent"
+    ).style.display =
+        "none";
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+function renderCards(items) {
+
+    const cards =
+        document.getElementById(
+            "cards"
+        );
+
+
+    cards.innerHTML =
+        items
+            .map(item => {
+
+                return `
+
+                    <div class="report-card">
+
+                        <div class="icon">
+
+                            <i
+                                class="${item.icon}">
+                            </i>
+
+                        </div>
+
+
+                        <div class="value">
+
+                            ${item.value}
+
+                        </div>
+
+
+                        <div class="label">
+
+                            ${item.label}
+
+                        </div>
+
+                    </div>
+
+                `;
+            })
+            .join("");
+}
+
+
+/* =========================================================
+   APPOINTMENTS
+   ========================================================= */
+
+function renderAppointments(list) {
+
+    const element =
+        document.getElementById(
+            "appointmentsTable"
+        );
+
+
+    if (!list.length) {
+
+        element.innerHTML = `
+            <div class="empty">
+                No appointments found.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const rows =
+        list
+            .slice()
+            .sort(
+                (a, b) =>
+                    String(
+                        b.appointmentTime || ""
+                    )
+                    .localeCompare(
+                        String(
+                            a.appointmentTime || ""
+                        )
+                    )
+            )
+            .slice(0, 10);
+
+
+    element.innerHTML = `
+
+        <table class="report-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Patient
+                    </th>
+
+                    <th>
+                        Doctor
+                    </th>
+
+                    <th>
+                        Date &amp; Time
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${rows.map(
+                    appointment => {
+
+                        const status =
+                            appointment.status ||
+                            "—";
+
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    ${patientNameOf(
+                                        appointment
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${doctorNameOf(
+                                        appointment
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${dateText(
+                                        appointment.appointmentTime
+                                    )}
+                                </td>
+
+                                <td>
+                                    ${status}
+                                </td>
+
+                            </tr>
+
+                        `;
+                    }
+                ).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================================================
+   MEDICAL RECORDS
+   ========================================================= */
+
+function renderRecords(list) {
+
+    const element =
+        document.getElementById(
+            "recordsTable"
+        );
+
+
+    if (!list.length) {
+
+        element.innerHTML = `
+            <div class="empty">
+                No medical records found.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const rows =
+        list
+            .slice()
+            .sort(
+                (a, b) =>
+                    String(
+                        b.recordDate || ""
+                    )
+                    .localeCompare(
+                        String(
+                            a.recordDate || ""
+                        )
+                    )
+            )
+            .slice(0, 10);
+
+
+    element.innerHTML = `
+
+        <table class="report-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Patient
+                    </th>
+
+                    <th>
+                        Diagnosis
+                    </th>
+
+                    <th>
+                        Treatment
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${rows.map(
+                    record => {
+
+                        return `
+
+                            <tr>
+
+                                <td>
+                                    ${
+                                        record.patientName ||
+                                        patientNameOf(
+                                            record
+                                        )
+                                    }
+                                </td>
+
+                                <td>
+                                    ${
+                                        record.diagnosis ||
+                                        "—"
+                                    }
+                                </td>
+
+                                <td>
+                                    ${
+                                        record.treatment ||
+                                        "—"
+                                    }
+                                </td>
+
+                                <td>
+                                    ${
+                                        record.recordDate ||
+                                        "—"
+                                    }
+                                </td>
+
+                            </tr>
+
+                        `;
+                    }
+                ).join("")}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================================================
+   LOAD REPORTS
+   ========================================================= */
+
+async function loadReports() {
+
+
+    document.getElementById(
+        "message"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "reportContent"
+    ).style.display =
+        "none";
+
+
+    try {
+
+
+        /* =================================================
+           ADMIN
+           ================================================= */
+
+        if (role === "ADMIN") {
+
+
+            const [
+                patients,
+                doctors,
+                appointments,
+                bills,
+                records
+            ] = await Promise.all([
+
+                apiGet("/patients"),
+
+                apiGet("/doctors"),
+
+                apiGet("/appointments"),
+
+                apiGet("/billing"),
+
+                apiGet("/medicalrecords")
+
+            ]);
+
+
+            const ps =
+                normalize(patients);
+
+
+            const ds =
+                normalize(doctors);
+
+
+            const aps =
+                normalize(appointments);
+
+
+            const bs =
+                normalize(bills);
+
+
+            const rs =
+                normalize(records);
+
+
+            const paid =
+                bs.filter(
+                    bill =>
+                        String(
+                            bill.status || ""
+                        ).toLowerCase()
+                        === "paid"
+                );
+
+
+            const pending =
+                bs.filter(
+                    bill =>
+                        String(
+                            bill.status || ""
+                        ).toLowerCase()
+                        === "pending"
+                );
+
+
+            const total =
+                bs.reduce(
+                    (sum, bill) =>
+                        sum +
+                        Number(
+                            bill.amount || 0
+                        ),
+                    0
+                );
+
+
+            const paidTotal =
+                paid.reduce(
+                    (sum, bill) =>
+                        sum +
+                        Number(
+                            bill.amount || 0
+                        ),
+                    0
+                );
+
+
+            renderCards([
+
+                {
+                    icon:
+                        "fa-solid fa-hospital-user",
+
+                    value:
+                        ps.length,
+
+                    label:
+                        "Total Patients"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-user-doctor",
+
+                    value:
+                        ds.length,
+
+                    label:
+                        "Total Doctors"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-calendar-check",
+
+                    value:
+                        aps.length,
+
+                    label:
+                        "Total Appointments"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-file-medical",
+
+                    value:
+                        rs.length,
+
+                    label:
+                        "Medical Records"
+                }
+
+            ]);
+
+
+            document.getElementById(
+                "financeSection"
+            ).style.display =
+                "block";
+
+
+            document.getElementById(
+                "financeBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td>
+                        Total billed
+                    </td>
+
+                    <td>
+                        ${money(total)}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Paid amount
+                    </td>
+
+                    <td>
+                        ${money(paidTotal)}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Pending amount
+                    </td>
+
+                    <td>
+                        ${money(
+                            total -
+                            paidTotal
+                        )}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Paid bills
+                    </td>
+
+                    <td>
+                        ${paid.length}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Pending bills
+                    </td>
+
+                    <td>
+                        ${pending.length}
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            document.getElementById(
+                "recordsSection"
+            ).style.display =
+                "block";
+
+
+            renderAppointments(
+                aps
+            );
+
+
+            renderRecords(
+                rs
+            );
+
+
+            document.getElementById(
+                "reportSubtitle"
+            ).textContent =
+                "Administrator overview of hospital activity and billing";
+
+        }
+
+
+        /* =================================================
+           DOCTOR
+           ================================================= */
+
+        else if (role === "DOCTOR") {
+
+
+            const [
+                doctor,
+                appointments
+            ] = await Promise.all([
+
+                apiGet("/doctors/me"),
+
+                apiGet("/appointments")
+
+            ]);
+
+
+            const aps =
+                normalize(appointments)
+                    .filter(
+                        appointment =>
+                            doctorIdOf(
+                                appointment
+                            ) ===
+                            doctor?.id
+                    );
+
+
+            const completed =
+                aps.filter(
+                    appointment =>
+                        String(
+                            appointment.status ||
+                            ""
+                        ).toLowerCase()
+                        === "completed"
+                ).length;
+
+
+            const upcoming =
+                aps.filter(
+                    appointment => {
+
+                        const status =
+                            String(
+                                appointment.status ||
+                                ""
+                            ).toLowerCase();
+
+
+                        return (
+                            status === "scheduled" ||
+                            status === "confirmed"
+                        );
+
+                    }
+                ).length;
+
+
+            renderCards([
+
+                {
+                    icon:
+                        "fa-solid fa-calendar-check",
+
+                    value:
+                        aps.length,
+
+                    label:
+                        "My Appointments"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-circle-check",
+
+                    value:
+                        completed,
+
+                    label:
+                        "Completed Appointments"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-clock",
+
+                    value:
+                        upcoming,
+
+                    label:
+                        "Upcoming Appointments"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-user-doctor",
+
+                    value:
+                        doctor?.name ||
+                        "Doctor",
+
+                    label:
+                        "Logged-in Doctor"
+                }
+
+            ]);
+
+
+            document.getElementById(
+                "financeSection"
+            ).style.display =
+                "none";
+
+
+            document.getElementById(
+                "recordsSection"
+            ).style.display =
+                "none";
+
+
+            renderAppointments(
+                aps
+            );
+
+
+            document.getElementById(
+                "reportSubtitle"
+            ).textContent =
+                "Your appointment activity summary";
+
+        }
+
+
+        /* =================================================
+           PATIENT
+           ================================================= */
+
+        else if (role === "PATIENT") {
+
+
+            const me =
+                await apiGet(
+                    "/patients/me"
+                );
+
+
+            const [
+                appointments,
+                bills,
+                records
+            ] = await Promise.all([
+
+                apiGet("/appointments"),
+
+                apiGet(
+                    "/billing/patient/" +
+                    encodeURIComponent(
+                        me.id
+                    )
+                ),
+
+                apiGet(
+                    "/medicalrecords/patient/" +
+                    encodeURIComponent(
+                        me.id
+                    )
+                )
+
+            ]);
+
+
+            const aps =
+                normalize(appointments)
+                    .filter(
+                        appointment =>
+                            patientIdOf(
+                                appointment
+                            ) ===
+                            me?.id
+                    );
+
+
+            const bs =
+                normalize(bills);
+
+
+            const rs =
+                normalize(records);
+
+
+            const paid =
+                bs.filter(
+                    bill =>
+                        String(
+                            bill.status ||
+                            ""
+                        ).toLowerCase()
+                        === "paid"
+                );
+
+
+            const total =
+                bs.reduce(
+                    (sum, bill) =>
+                        sum +
+                        Number(
+                            bill.amount || 0
+                        ),
+                    0
+                );
+
+
+            const paidTotal =
+                paid.reduce(
+                    (sum, bill) =>
+                        sum +
+                        Number(
+                            bill.amount || 0
+                        ),
+                    0
+                );
+
+
+            renderCards([
+
+                {
+                    icon:
+                        "fa-solid fa-calendar-check",
+
+                    value:
+                        aps.length,
+
+                    label:
+                        "My Appointments"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-file-medical",
+
+                    value:
+                        rs.length,
+
+                    label:
+                        "My Medical Records"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-file-invoice-dollar",
+
+                    value:
+                        bs.length,
+
+                    label:
+                        "My Bills"
+                },
+
+
+                {
+                    icon:
+                        "fa-solid fa-circle-check",
+
+                    value:
+                        paid.length,
+
+                    label:
+                        "Paid Bills"
+                }
+
+            ]);
+
+
+            document.getElementById(
+                "financeSection"
+            ).style.display =
+                "block";
+
+
+            document.getElementById(
+                "financeBody"
+            ).innerHTML = `
+
+                <tr>
+
+                    <td>
+                        Total billed
+                    </td>
+
+                    <td>
+                        ${money(total)}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Paid amount
+                    </td>
+
+                    <td>
+                        ${money(paidTotal)}
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Pending amount
+                    </td>
+
+                    <td>
+                        ${money(
+                            total -
+                            paidTotal
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            document.getElementById(
+                "recordsSection"
+            ).style.display =
+                "block";
+
+
+            renderAppointments(
+                aps
+            );
+
+
+            renderRecords(
+                rs
+            );
+
+
+            document.getElementById(
+                "reportSubtitle"
+            ).textContent =
+                "Your personal hospital activity summary";
+
+        }
+
+
+        /* =================================================
+           UNKNOWN ROLE
+           ================================================= */
+
+        else {
+
+            showError(
+                "Your account role is not supported for reports."
+            );
+
+            return;
+        }
+
+
+        document.getElementById(
+            "reportContent"
+        ).style.display =
+            "block";
+
+
+    } catch (error) {
+
+        console.error(
+            "Reports loading error:",
+            error
+        );
+
+
+        showError(
+            error?.message ||
+            "Unable to load reports."
+        );
+    }
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadReports();
+
+    }
+);
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Generate Bill | Hospital Management System</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        .form-card {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            margin-bottom: 28px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 17px;
+        }
+
+        .form-section-title i {
+            margin-right: 7px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .form-control {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #1683c4;
+            box-shadow:
+                0 0 0 3px
+                rgba(22, 131, 196, 0.10);
+        }
+
+        .form-help {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .patient-preview {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .patient-preview strong {
+            color: #0f172a;
+        }
+
+        .amount-preview {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .amount-preview-label {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .amount-preview-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .message-box {
+            display: none;
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .message-box.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #166534;
+        }
+
+        .message-box.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .access-warning {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 40px 25px;
+            text-align: center;
+        }
+
+        .access-warning i {
+            display: block;
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .access-warning p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 750px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>Patients</span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>Doctors</span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>Appointments</span>
+
+            </a>
+
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>Medical Records</span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>Billing</span>
+
+            </a>
+
+
+            <div class="nav-section-title system-section">
+                System
+            </div>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Reports')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+
+                <span>Reports</span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Settings')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+
+                <span>Settings</span>
+
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>Logout</span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- HEADER -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1>Generate Bill</h1>
+
+                <p id="currentDate">
+                    Billing management
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+
+                <div class="search-box">
+
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+
+                    <input type="text"
+                           placeholder="Search patients, doctors...">
+
+                </div>
+
+
+                <button type="button"
+                        class="header-icon notification">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+                        A
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+                            Administrator
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+                            Administrator
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- CONTENT -->
+
+        <section class="page-content">
+
+
+            <div class="card form-card">
+
+
+                <!-- CARD HEADER -->
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Generate Bill
+                        </div>
+
+                        <div class="card-subtitle">
+                            Create a new billing record for a patient
+                        </div>
+
+                    </div>
+
+
+                    <a href="/ui/billing"
+                       class="btn">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- FORM BODY -->
+
+                <div style="padding:25px;">
+
+
+                    <div id="messageBox"
+                         class="message-box">
+                    </div>
+
+
+                    <form id="billingForm">
+
+
+                        <!-- =================================================
+                             PATIENT
+                             ================================================= -->
+
+                        <div class="form-section">
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-user-injured"></i>
+
+                                Patient Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <div class="form-group full-width">
+
+                                    <label for="patientId">
+
+                                        Patient
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        id="patientId"
+                                        class="form-control"
+                                        required>
+
+                                        <option value="">
+                                            Loading patients...
+                                        </option>
+
+                                    </select>
+
+
+                                    <div class="form-help">
+
+                                        Select any patient
+                                        for whom the bill
+                                        should be generated.
+
+                                    </div>
+
+
+                                    <div class="patient-preview"
+                                         id="patientPreview">
+
+                                        <strong>
+                                            Selected Patient:
+                                        </strong>
+
+                                        <span id="selectedPatientName">
+                                            --
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             BILL INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section">
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+
+                                Billing Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- AMOUNT -->
+
+                                <div class="form-group">
+
+                                    <label for="amount">
+
+                                        Amount
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="number"
+                                        id="amount"
+                                        class="form-control"
+                                        min="0"
+                                        step="0.01"
+                                        placeholder="Enter amount"
+                                        required>
+
+
+                                    <div class="form-help">
+
+                                        Enter the billing amount
+                                        in Indian Rupees.
+
+                                    </div>
+
+
+                                    <div class="amount-preview"
+                                         id="amountPreview">
+
+                                        <span class="amount-preview-label">
+                                            Bill Amount
+                                        </span>
+
+                                        <span
+                                            class="amount-preview-value"
+                                            id="amountPreviewValue">
+                                            ₹0.00
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- STATUS -->
+
+                                <div class="form-group">
+
+                                    <label for="status">
+
+                                        Payment Status
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        id="status"
+                                        class="form-control"
+                                        required>
+
+                                        <option value="Pending">
+                                            Pending
+                                        </option>
+
+                                        <option value="Paid">
+                                            Paid
+                                        </option>
+
+                                    </select>
+
+
+                                    <div class="form-help">
+
+                                        Select the current
+                                        payment status.
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- DATE -->
+
+                                <div class="form-group">
+
+                                    <label for="billingDate">
+
+                                        Billing Date
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="date"
+                                        id="billingDate"
+                                        class="form-control"
+                                        required>
+
+
+                                    <div class="form-help">
+
+                                        Date when the bill
+                                        was generated.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="form-actions">
+
+                            <a href="/ui/billing"
+                               class="btn">
+
+                                Cancel
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="generateBillButton">
+
+                                <i class="fa-solid fa-file-circle-plus"></i>
+
+                                Generate Bill
+
+                            </button>
+
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     API.JS
+     ========================================================= -->
+
+<script th:src="@{/js/api.js}"></script>
+
+
+
+<script>
+
+
+    // =========================================================
+    // GLOBAL
+    // =========================================================
+
+    let patients = [];
+
+    let currentRole = "";
+
+
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async function () {
+
+            initializeDate();
+
+
+            currentRole =
+                normalizeRole(
+                    getCurrentRole()
+                );
+
+
+            loadProfile();
+
+
+            setDefaultDate();
+
+
+            /*
+             * Only ADMIN can generate bills.
+             */
+
+            if (
+                currentRole !== "ADMIN"
+            ) {
+
+                showAccessDenied();
+
+                return;
+
+            }
+
+
+            await loadPatients();
+
+
+            document.getElementById(
+                "billingForm"
+            ).addEventListener(
+                "submit",
+                generateBill
+            );
+
+
+            document.getElementById(
+                "patientId"
+            ).addEventListener(
+                "change",
+                handlePatientChange
+            );
+
+
+            document.getElementById(
+                "amount"
+            ).addEventListener(
+                "input",
+                updateAmountPreview
+            );
+
+        }
+    );
+
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
+
+    function initializeDate() {
+
+        document.getElementById(
+            "currentDate"
+        ).textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+
+    }
+
+
+
+    function setDefaultDate() {
+
+        const date =
+            new Date();
+
+
+        const year =
+            date.getFullYear();
+
+
+        const month =
+            String(
+                date.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const day =
+            String(
+                date.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        document.getElementById(
+            "billingDate"
+        ).value =
+            year
+            + "-"
+            + month
+            + "-"
+            + day;
+
+    }
+
+
+
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    function getToken() {
+
+        return localStorage.getItem(
+            "jwtToken"
+        )
+        ||
+        localStorage.getItem(
+            "token"
+        )
+        ||
+        localStorage.getItem(
+            "accessToken"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // JWT
+    // =========================================================
+
+    function getUserFromToken() {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            const parts =
+                token.split(".");
+
+
+            if (
+                parts.length !== 3
+            ) {
+
+                return null;
+
+            }
+
+
+            return JSON.parse(
+                atob(
+                    parts[1]
+                        .replace(
+                            /-/g,
+                            "+"
+                        )
+                        .replace(
+                            /_/g,
+                            "/"
+                        )
+                )
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "JWT decode error:",
+                error
+            );
+
+
+            return null;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ROLE
+    // =========================================================
+
+    function getCurrentRole() {
+
+        const user =
+            getUserFromToken();
+
+
+        if (!user) {
+
+            return "";
+
+        }
+
+
+        let role =
+            user.role
+            ||
+            user.roles
+            ||
+            user.authorities;
+
+
+        if (
+            Array.isArray(role)
+        ) {
+
+            role =
+                role[0];
+
+        }
+
+
+        if (
+            role
+            &&
+            typeof role === "object"
+        ) {
+
+            role =
+                role.authority
+                ||
+                role.role;
+
+        }
+
+
+        return String(
+            role || ""
+        );
+
+    }
+
+
+
+    function normalizeRole(
+        role
+    ) {
+
+        return String(
+            role || ""
+        )
+        .replace(
+            "ROLE_",
+            ""
+        )
+        .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function loadProfile() {
+
+        const user =
+            getUserFromToken();
+
+
+        const username =
+            user?.username
+            ||
+            user?.name
+            ||
+            user?.sub
+            ||
+            "User";
+
+
+        document.getElementById(
+            "profileName"
+        ).textContent =
+            username;
+
+
+        document.getElementById(
+            "profileRole"
+        ).textContent =
+            formatRole(
+                currentRole
+            );
+
+
+        document.getElementById(
+            "profileAvatar"
+        ).textContent =
+            username
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // LOAD PATIENTS
+    // =========================================================
+
+    async function loadPatients() {
+
+        const select =
+            document.getElementById(
+                "patientId"
+            );
+
+
+        try {
+
+            const data =
+                await apiGet(
+                    "/patients"
+                );
+
+
+            patients =
+                Array.isArray(data)
+                ? data
+                : [];
+
+
+            select.innerHTML = `
+
+                <option value="">
+                    Select patient
+                </option>
+
+            `;
+
+
+            patients.forEach(
+                function (patient) {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        patient.id;
+
+
+                    option.textContent =
+                        (
+                            patient.name
+                            ||
+                            "Unknown Patient"
+                        )
+                        +
+                        " — ID: "
+                        +
+                        (
+                            patient.id
+                            ?? "--"
+                        );
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            if (
+                patients.length === 0
+            ) {
+
+                select.innerHTML = `
+
+                    <option value="">
+                        No patients available
+                    </option>
+
+                `;
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Unable to load patients:",
+                error
+            );
+
+
+            select.innerHTML = `
+
+                <option value="">
+                    Unable to load patients
+                </option>
+
+            `;
+
+
+            showMessage(
+                "Unable to load patients.",
+                "error",
+                "fa-solid fa-triangle-exclamation"
+            );
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // PATIENT CHANGE
+    // =========================================================
+
+    function handlePatientChange() {
+
+        const patientId =
+            document.getElementById(
+                "patientId"
+            ).value;
+
+
+        const preview =
+            document.getElementById(
+                "patientPreview"
+            );
+
+
+        if (!patientId) {
+
+            preview.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        const patient =
+            patients.find(
+                function (item) {
+
+                    return String(
+                        item.id
+                    )
+                    ===
+                    String(
+                        patientId
+                    );
+
+                }
+            );
+
+
+        if (patient) {
+
+            document.getElementById(
+                "selectedPatientName"
+            ).textContent =
+                patient.name
+                ||
+                "Unknown Patient";
+
+
+            preview.style.display =
+                "block";
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // AMOUNT PREVIEW
+    // =========================================================
+
+    function updateAmountPreview() {
+
+        const amount =
+            document.getElementById(
+                "amount"
+            ).value;
+
+
+        const preview =
+            document.getElementById(
+                "amountPreview"
+            );
+
+
+        if (
+            amount
+            &&
+            Number(amount) >= 0
+        ) {
+
+            document.getElementById(
+                "amountPreviewValue"
+            ).textContent =
+                formatCurrency(
+                    amount
+                );
+
+
+            preview.style.display =
+                "block";
+
+        }
+
+        else {
+
+            preview.style.display =
+                "none";
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // GENERATE BILL
+    // =========================================================
+
+    async function generateBill(
+        event
+    ) {
+
+        event.preventDefault();
+
+
+        const patientId =
+            document.getElementById(
+                "patientId"
+            ).value;
+
+
+        const amount =
+            document.getElementById(
+                "amount"
+            ).value;
+
+
+        const status =
+            document.getElementById(
+                "status"
+            ).value;
+
+
+        const billingDate =
+            document.getElementById(
+                "billingDate"
+            ).value;
+
+
+        if (!patientId) {
+
+            showMessage(
+                "Please select a patient.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            amount === ""
+            ||
+            Number(amount) < 0
+        ) {
+
+            showMessage(
+                "Please enter a valid amount.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+            return;
+
+        }
+
+
+        if (!billingDate) {
+
+            showMessage(
+                "Please select the billing date.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+            return;
+
+        }
+
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            showMessage(
+                "Please login again.",
+                "error",
+                "fa-solid fa-lock"
+            );
+
+            return;
+
+        }
+
+
+        const button =
+            document.getElementById(
+                "generateBillButton"
+            );
+
+
+        button.disabled =
+            true;
+
+
+        button.innerHTML = `
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Generating...
+
+        `;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/billing/patient/"
+                    +
+                    encodeURIComponent(
+                        patientId
+                    ),
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer "
+                                +
+                                token,
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                amount:
+                                    Number(
+                                        amount
+                                    ),
+
+                                status:
+                                    status,
+
+                                billingDate:
+                                    billingDate
+
+                            })
+
+                    }
+                );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                showMessage(
+                    "Your session has expired. Please login again.",
+                    "error",
+                    "fa-solid fa-lock"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                response.status === 403
+            ) {
+
+                showMessage(
+                    "You are not authorized to generate bills.",
+                    "error",
+                    "fa-solid fa-shield-halved"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                response.status === 400
+            ) {
+
+                let message =
+                    "Please check the billing information.";
+
+
+                try {
+
+                    const errorData =
+                        await response.json();
+
+
+                    message =
+                        errorData.message
+                        ||
+                        errorData.error
+                        ||
+                        message;
+
+                }
+
+                catch (error) {
+
+                    console.warn(
+                        "Could not read validation response.",
+                        error
+                    );
+
+                }
+
+
+                showMessage(
+                    message,
+                    "error",
+                    "fa-solid fa-circle-exclamation"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !response.ok
+            ) {
+
+                const errorText =
+                    await response.text();
+
+
+                console.error(
+                    "Billing error:",
+                    errorText
+                );
+
+
+                throw new Error(
+                    "HTTP "
+                    +
+                    response.status
+                );
+
+            }
+
+
+            const savedBill =
+                await response.json();
+
+
+            console.log(
+                "Bill created:",
+                savedBill
+            );
+
+
+            showMessage(
+                "Bill generated successfully.",
+                "success",
+                "fa-solid fa-circle-check"
+            );
+
+
+            document
+                .getElementById(
+                    "billingForm"
+                )
+                .reset();
+
+
+            setDefaultDate();
+
+
+            document.getElementById(
+                "patientPreview"
+            ).style.display =
+                "none";
+
+
+            document.getElementById(
+                "amountPreview"
+            ).style.display =
+                "none";
+
+
+            setTimeout(
+                function () {
+
+                    window.location.href =
+                        "/ui/billing";
+
+                },
+                1200
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Generate bill error:",
+                error
+            );
+
+
+            showMessage(
+                "Unable to generate the bill.",
+                "error",
+                "fa-solid fa-triangle-exclamation"
+            );
+
+        }
+
+        finally {
+
+            button.disabled =
+                false;
+
+
+            button.innerHTML = `
+
+                <i class="fa-solid fa-file-circle-plus"></i>
+
+                Generate Bill
+
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ACCESS DENIED
+    // =========================================================
+
+    function showAccessDenied() {
+
+        document.querySelector(
+            ".page-content"
+        ).innerHTML = `
+
+            <div class="card access-warning">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    Only administrators can generate billing records.
+                </p>
+
+                <a href="/ui/billing"
+                   class="btn btn-primary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Billing
+
+                </a>
+
+            </div>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // MESSAGE
+    // =========================================================
+
+    function showMessage(
+        message,
+        type,
+        icon
+    ) {
+
+        const box =
+            document.getElementById(
+                "messageBox"
+            );
+
+
+        if (!box) {
+            return;
+        }
+
+
+        box.className =
+            "message-box "
+            +
+            type;
+
+
+        box.innerHTML = `
+
+            <i class="${icon}"></i>
+
+            ${escapeHtml(
+                message
+            )}
+
+        `;
+
+
+        box.style.display =
+            "block";
+
+    }
+
+
+
+    // =========================================================
+    // CURRENCY
+    // =========================================================
+
+    function formatCurrency(
+        amount
+    ) {
+
+        return Number(
+            amount
+            ||
+            0
+        ).toLocaleString(
+            "en-IN",
+            {
+                style: "currency",
+                currency: "INR",
+                minimumFractionDigits: 2
+            }
+        );
+
+    }
+
+
+
+    // =========================================================
+    // ROLE DISPLAY
+    // =========================================================
+
+    function formatRole(
+        role
+    ) {
+
+        role =
+            normalizeRole(
+                role
+            );
+
+
+        if (!role) {
+
+            return "User";
+
+        }
+
+
+        return role
+            .charAt(0)
+            .toUpperCase()
+            +
+            role
+                .substring(1)
+                .toLowerCase();
+
+    }
+
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(
+            value
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // COMING SOON
+    // =========================================================
+
+    function showComingSoon(
+        event,
+        page
+    ) {
+
+        event.preventDefault();
+
+        alert(
+            page
+            +
+            " will be available soon."
+        );
+
+    }
+
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+        localStorage.removeItem(
+            "jwtToken"
+        );
+
+        localStorage.removeItem(
+            "token"
+        );
+
+        localStorage.removeItem(
+            "accessToken"
+        );
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

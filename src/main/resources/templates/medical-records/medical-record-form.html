@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title id="pageTitle">Add Medical Record | Hospital Management System</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <!-- Responsive CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* =========================================================
+           MEDICAL RECORD FORM
+           ========================================================= */
+
+        .form-card {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .form-group label .required {
+            color: #dc2626;
+        }
+
+        .form-control {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            transition: border-color 0.2s ease,
+                        box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #1683c4;
+            box-shadow: 0 0 0 3px rgba(22, 131, 196, 0.10);
+        }
+
+        textarea.form-control {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .form-help {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .patient-preview {
+            display: none;
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .patient-preview strong {
+            color: #0f172a;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .message-box {
+            display: none;
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .message-box.success {
+            display: block;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #166534;
+        }
+
+        .message-box.error {
+            display: block;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .message-box.info {
+            display: block;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        .message-box i {
+            margin-right: 7px;
+        }
+
+        .loading-text {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .access-warning {
+            max-width: 700px;
+            margin: 40px auto;
+            text-align: center;
+            padding: 40px 25px;
+        }
+
+        .access-warning i {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .access-warning h2 {
+            margin-bottom: 10px;
+        }
+
+        .access-warning p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 750px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <!-- BRAND -->
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <!-- Dashboard -->
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- Patients -->
+
+            <a href="/ui/patients"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>
+                    Patients
+                </span>
+
+            </a>
+
+
+            <!-- Doctors -->
+
+            <a href="/ui/doctors"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>
+                    Doctors
+                </span>
+
+            </a>
+
+
+            <!-- Appointments -->
+
+            <a href="/ui/appointments"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>
+                    Appointments
+                </span>
+
+            </a>
+
+
+            <!-- Clinical -->
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <!-- Medical Records -->
+
+            <a href="/ui/medical-records"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>
+                    Medical Records
+                </span>
+
+            </a>
+
+
+            <!-- Billing -->
+
+            <a href="/ui/billing"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>
+                    Billing
+                </span>
+
+            </a>
+
+
+            <!-- System -->
+
+            <div class="nav-section-title system-section">
+                System
+            </div>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Reports')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+
+                <span>
+                    Reports
+                </span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Settings')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+
+                <span>
+                    Settings
+                </span>
+
+            </a>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1>
+                    Add Medical Record
+                </h1>
+
+                <p id="currentDate">
+                    Medical record management
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+
+                <!-- SEARCH -->
+
+                <div class="search-box">
+
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+
+                    <input type="text"
+                           placeholder="Search patients, doctors...">
+
+                </div>
+
+
+                <!-- NOTIFICATION -->
+
+                <button type="button"
+                        class="header-icon notification"
+                        title="Notifications">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- PROFILE -->
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+                        U
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+                            User
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+                            User
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+             ===================================================== -->
+
+        <section class="page-content">
+
+
+            <!-- =================================================
+                 FORM
+                 ================================================= -->
+
+            <div class="card form-card">
+
+
+                <!-- CARD HEADER -->
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Add Medical Record
+                        </div>
+
+                        <div class="card-subtitle"
+                             id="formSubtitle">
+
+                            Create a new patient medical record
+
+                        </div>
+
+                    </div>
+
+
+                    <a href="/ui/medical-records"
+                       class="btn">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     FORM BODY
+                     ================================================= -->
+
+                <div style="padding: 25px;">
+
+
+                    <!-- MESSAGE -->
+
+                    <div id="messageBox"
+                         class="message-box">
+
+                    </div>
+
+
+                    <form id="medicalRecordForm">
+
+
+                        <!-- =================================================
+                             PATIENT INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section">
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-user-injured"></i>
+
+                                Patient Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- PATIENT -->
+
+                                <div class="form-group full-width"
+                                     id="patientFieldGroup">
+
+                                    <label for="patientId">
+
+                                        Patient
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <select
+                                        id="patientId"
+                                        class="form-control"
+                                        required>
+
+                                        <option value="">
+                                            Loading patients...
+                                        </option>
+
+                                    </select>
+
+
+                                    <div class="form-help"
+                                         id="patientHelp">
+
+                                        Select the patient for this
+                                        medical record.
+
+                                    </div>
+
+
+                                    <div class="patient-preview"
+                                         id="patientPreview">
+
+                                        <strong>
+                                            Selected Patient:
+                                        </strong>
+
+                                        <span id="selectedPatientName">
+                                            --
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             MEDICAL INFORMATION
+                             ================================================= -->
+
+                        <div class="form-section">
+
+                            <div class="form-section-title">
+
+                                <i class="fa-solid fa-stethoscope"></i>
+
+                                Medical Information
+
+                            </div>
+
+
+                            <div class="form-grid">
+
+
+                                <!-- DIAGNOSIS -->
+
+                                <div class="form-group full-width">
+
+                                    <label for="diagnosis">
+
+                                        Diagnosis
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="text"
+                                        id="diagnosis"
+                                        class="form-control"
+                                        placeholder="Enter diagnosis"
+                                        maxlength="255"
+                                        required>
+
+
+                                    <div class="form-help">
+
+                                        Enter the patient's diagnosis.
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- TREATMENT -->
+
+                                <div class="form-group full-width">
+
+                                    <label for="treatment">
+
+                                        Treatment
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <textarea
+                                        id="treatment"
+                                        class="form-control"
+                                        placeholder="Enter treatment details"
+                                        maxlength="2000"
+                                        required></textarea>
+
+
+                                    <div class="form-help">
+
+                                        Describe the prescribed treatment,
+                                        medication or recommendations.
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- RECORD DATE -->
+
+                                <div class="form-group">
+
+                                    <label for="recordDate">
+
+                                        Record Date
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+
+                                    <input
+                                        type="date"
+                                        id="recordDate"
+                                        class="form-control"
+                                        required>
+
+
+                                    <div class="form-help">
+
+                                        Date when this medical record
+                                        was created.
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             ACTIONS
+                             ================================================= -->
+
+                        <div class="form-actions">
+
+
+                            <a href="/ui/medical-records"
+                               class="btn">
+
+                                Cancel
+
+                            </a>
+
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="saveRecordButton">
+
+                                <i class="fa-solid fa-floppy-disk"></i>
+
+                                <span id="saveButtonText">Save Medical Record</span>
+
+                            </button>
+
+
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     API.JS
+     ========================================================= -->
+
+<script th:src="@{/js/api.js}"></script>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+
+    // =========================================================
+    // GLOBAL VARIABLES
+    // =========================================================
+
+    let currentRole = "";
+
+    let selectedPatients = [];
+    let editRecordId = new URLSearchParams(window.location.search).get("editId");
+    let editingRecord = null;
+
+
+
+    // =========================================================
+    // INITIALIZATION
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async function () {
+
+            initializeDate();
+
+
+            currentRole =
+                normalizeRole(
+                    getCurrentRole()
+                );
+
+
+            console.log(
+                "Medical Record Form role:",
+                currentRole
+            );
+
+
+            loadProfile();
+
+
+            setDefaultDate();
+
+
+            /*
+             * Patient accounts cannot create records.
+             */
+
+            if (
+                currentRole === "PATIENT"
+            ) {
+
+                showAccessDenied();
+
+                return;
+
+            }
+
+
+            /*
+             * Admin and Doctor can create records.
+             */
+
+            if (
+                currentRole === "ADMIN"
+                ||
+                currentRole === "DOCTOR"
+            ) {
+
+                await loadPatients();
+
+                if (editRecordId) {
+                    await loadRecordForEdit(editRecordId);
+                }
+
+            }
+
+
+            document.getElementById(
+                "medicalRecordForm"
+            ).addEventListener(
+                "submit",
+                saveMedicalRecord
+            );
+
+
+            document.getElementById(
+                "patientId"
+            ).addEventListener(
+                "change",
+                handlePatientChange
+            );
+
+        }
+    );
+
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
+
+    function initializeDate() {
+
+        document.getElementById(
+            "currentDate"
+        ).textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+
+    }
+
+
+
+    // =========================================================
+    // DEFAULT DATE
+    // =========================================================
+
+    function setDefaultDate() {
+
+        const date =
+            new Date();
+
+
+        const yyyy =
+            date.getFullYear();
+
+
+        const mm =
+            String(
+                date.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const dd =
+            String(
+                date.getDate()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        document.getElementById(
+            "recordDate"
+        ).value =
+            yyyy
+            + "-"
+            + mm
+            + "-"
+            + dd;
+
+    }
+
+
+
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    function getToken() {
+
+        return localStorage.getItem(
+            "jwtToken"
+        )
+        ||
+        localStorage.getItem(
+            "token"
+        )
+        ||
+        localStorage.getItem(
+            "accessToken"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // JWT USER
+    // =========================================================
+
+    function getUserFromToken() {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            const parts =
+                token.split(".");
+
+
+            if (
+                parts.length !== 3
+            ) {
+
+                return null;
+
+            }
+
+
+            return JSON.parse(
+                atob(
+                    parts[1]
+                        .replace(
+                            /-/g,
+                            "+"
+                        )
+                        .replace(
+                            /_/g,
+                            "/"
+                        )
+                )
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "JWT decoding failed:",
+                error
+            );
+
+
+            return null;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ROLE
+    // =========================================================
+
+    function getCurrentRole() {
+
+        const user =
+            getUserFromToken();
+
+
+        if (!user) {
+
+            return "";
+
+        }
+
+
+        let role =
+            user.role
+            ||
+            user.roles
+            ||
+            user.authorities;
+
+
+        if (
+            Array.isArray(role)
+        ) {
+
+            role =
+                role[0];
+
+        }
+
+
+        if (
+            role
+            &&
+            typeof role === "object"
+        ) {
+
+            role =
+                role.authority
+                ||
+                role.role;
+
+        }
+
+
+        return String(
+            role || ""
+        );
+
+    }
+
+
+
+    // =========================================================
+    // NORMALIZE ROLE
+    // =========================================================
+
+    function normalizeRole(
+        role
+    ) {
+
+        return String(
+            role || ""
+        )
+        .replace(
+            "ROLE_",
+            ""
+        )
+        .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function loadProfile() {
+
+        const user =
+            getUserFromToken();
+
+
+        const username =
+            user?.username
+            ||
+            user?.name
+            ||
+            user?.sub
+            ||
+            "User";
+
+
+        document.getElementById(
+            "profileName"
+        ).textContent =
+            username;
+
+
+        document.getElementById(
+            "profileRole"
+        ).textContent =
+            formatRole(
+                currentRole
+            );
+
+
+        document.getElementById(
+            "profileAvatar"
+        ).textContent =
+            username
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // LOAD PATIENTS
+    // =========================================================
+
+    async function loadPatients() {
+
+        const select =
+            document.getElementById(
+                "patientId"
+            );
+
+
+        select.innerHTML = `
+
+            <option value="">
+                Loading patients...
+            </option>
+
+        `;
+
+
+        /*
+         * ADMIN:
+         *
+         * Admin can choose any patient.
+         */
+
+        if (
+            currentRole === "ADMIN"
+        ) {
+
+            try {
+
+                const patients =
+                    await apiGet(
+                        "/patients"
+                    );
+
+
+                selectedPatients =
+                    Array.isArray(
+                        patients
+                    )
+                    ? patients
+                    : [];
+
+
+                populatePatientSelect(
+                    selectedPatients
+                );
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Patient loading error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to load patients.",
+                    "error",
+                    "fa-solid fa-triangle-exclamation"
+                );
+
+
+                select.innerHTML = `
+
+                    <option value="">
+                        Unable to load patients
+                    </option>
+
+                `;
+
+            }
+
+
+            return;
+
+        }
+
+
+
+        /*
+         * DOCTOR:
+         *
+         * Use the patients from the doctor's
+         * appointments.
+         */
+
+        if (
+            currentRole === "DOCTOR"
+        ) {
+
+            try {
+
+                const appointments =
+                    await apiGet(
+                        "/appointments"
+                    );
+
+
+                const appointmentList =
+                    Array.isArray(
+                        appointments
+                    )
+                    ? appointments
+                    : [];
+
+
+                const uniquePatients =
+                    new Map();
+
+
+                appointmentList.forEach(
+                    function (appointment) {
+
+                        const patient =
+                            appointment?.patient;
+
+
+                        if (
+                            patient
+                            &&
+                            patient.id
+                        ) {
+
+                            uniquePatients.set(
+                                String(
+                                    patient.id
+                                ),
+                                patient
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                selectedPatients =
+                    Array.from(
+                        uniquePatients.values()
+                    );
+
+
+                populatePatientSelect(
+                    selectedPatients
+                );
+
+
+                if (
+                    selectedPatients.length === 0
+                ) {
+
+                    showMessage(
+                        "No authorized patients were found.",
+                        "info",
+                        "fa-solid fa-circle-info"
+                    );
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Doctor patient loading error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to load your patients.",
+                    "error",
+                    "fa-solid fa-triangle-exclamation"
+                );
+
+
+                select.innerHTML = `
+
+                    <option value="">
+                        Unable to load patients
+                    </option>
+
+                `;
+
+            }
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // POPULATE PATIENT SELECT
+    // =========================================================
+
+    function populatePatientSelect(
+        patients
+    ) {
+
+        const select =
+            document.getElementById(
+                "patientId"
+            );
+
+
+        select.innerHTML = `
+
+            <option value="">
+                Select patient
+            </option>
+
+        `;
+
+
+        if (
+            !Array.isArray(patients)
+            ||
+            patients.length === 0
+        ) {
+
+            select.innerHTML = `
+
+                <option value="">
+                    No patients available
+                </option>
+
+            `;
+
+            return;
+
+        }
+
+
+        patients.forEach(
+            function (patient) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    patient.id;
+
+
+                option.textContent =
+                    (
+                        patient.name
+                        ||
+                        "Unknown Patient"
+                    )
+                    +
+                    " — ID: "
+                    +
+                    (
+                        patient.id
+                        ?? "--"
+                    );
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // =========================================================
+    // PATIENT CHANGE
+    // =========================================================
+
+    function handlePatientChange() {
+
+        const patientId =
+            document.getElementById(
+                "patientId"
+            ).value;
+
+
+        const preview =
+            document.getElementById(
+                "patientPreview"
+            );
+
+
+        const nameElement =
+            document.getElementById(
+                "selectedPatientName"
+            );
+
+
+        if (!patientId) {
+
+            preview.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        const patient =
+            selectedPatients.find(
+                function (item) {
+
+                    return String(
+                        item.id
+                    )
+                    ===
+                    String(
+                        patientId
+                    );
+
+                }
+            );
+
+
+        if (patient) {
+
+            nameElement.textContent =
+                patient.name
+                ||
+                "Unknown Patient";
+
+
+            preview.style.display =
+                "block";
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // LOAD RECORD FOR EDIT
+    // =========================================================
+
+    async function loadRecordForEdit(recordId) {
+
+        try {
+            editingRecord = await apiGet(
+                "/medicalrecords/" + encodeURIComponent(recordId)
+            );
+
+            if (!editingRecord) {
+                throw new Error("Medical record not found.");
+            }
+
+            document.getElementById("pageTitle").textContent =
+                "Edit Medical Record | Hospital Management System";
+            document.getElementById("saveButtonText").textContent =
+                "Update Medical Record";
+
+            const patientId = editingRecord.patientId ?? editingRecord.patient?.id;
+            const patientSelect = document.getElementById("patientId");
+
+            if (patientId != null) {
+                patientSelect.value = String(patientId);
+                patientSelect.disabled = true;
+                handlePatientChange();
+            }
+
+            document.getElementById("diagnosis").value = editingRecord.diagnosis || "";
+            document.getElementById("treatment").value = editingRecord.treatment || "";
+            document.getElementById("recordDate").value = editingRecord.recordDate || "";
+
+        } catch (error) {
+            console.error("Unable to load record for editing:", error);
+            showMessage(error.message || "Unable to load the medical record.", "error", "fa-solid fa-circle-exclamation");
+            document.getElementById("saveRecordButton").disabled = true;
+        }
+    }
+
+
+    // =========================================================
+    // SAVE MEDICAL RECORD
+    // =========================================================
+
+    async function saveMedicalRecord(
+        event
+    ) {
+
+        event.preventDefault();
+
+
+        const button =
+            document.getElementById(
+                "saveRecordButton"
+            );
+
+
+        const patientId =
+            document.getElementById(
+                "patientId"
+            ).value;
+
+
+        const diagnosis =
+            document.getElementById(
+                "diagnosis"
+            ).value.trim();
+
+
+        const treatment =
+            document.getElementById(
+                "treatment"
+            ).value.trim();
+
+
+        const recordDate =
+            document.getElementById(
+                "recordDate"
+            ).value;
+
+
+        /*
+         * Basic validation
+         */
+
+        if (!patientId) {
+
+            showMessage(
+                "Please select a patient.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+            return;
+
+        }
+
+
+        if (!diagnosis) {
+
+            showMessage(
+                "Diagnosis is required.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+
+            document.getElementById(
+                "diagnosis"
+            ).focus();
+
+
+            return;
+
+        }
+
+
+        if (!treatment) {
+
+            showMessage(
+                "Treatment is required.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+
+            document.getElementById(
+                "treatment"
+            ).focus();
+
+
+            return;
+
+        }
+
+
+        if (!recordDate) {
+
+            showMessage(
+                "Record date is required.",
+                "error",
+                "fa-solid fa-circle-exclamation"
+            );
+
+
+            document.getElementById(
+                "recordDate"
+            ).focus();
+
+
+            return;
+
+        }
+
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            showMessage(
+                "Your session has expired. Please login again.",
+                "error",
+                "fa-solid fa-lock"
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+         * Disable button
+         */
+
+        button.disabled =
+            true;
+
+
+        button.innerHTML = `
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            Saving...
+
+        `;
+
+
+        const isEdit = !!editRecordId;
+
+        const url = isEdit
+            ? "/medicalrecords/" + encodeURIComponent(editRecordId)
+            : "/medicalrecords/patient/" + encodeURIComponent(patientId);
+
+        const requestBody = {
+            diagnosis: diagnosis,
+            treatment: treatment,
+            recordDate: recordDate
+        };
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: isEdit ? "PUT" : "POST",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer " + token,
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(
+                                requestBody
+                            )
+
+                    }
+                );
+
+
+            /*
+             * UNAUTHORIZED
+             */
+
+            if (
+                response.status === 401
+            ) {
+
+                showMessage(
+                    "Your session has expired. Please login again.",
+                    "error",
+                    "fa-solid fa-lock"
+                );
+
+
+                return;
+
+            }
+
+
+            /*
+             * FORBIDDEN
+             */
+
+            if (
+                response.status === 403
+            ) {
+
+                showMessage(
+                    "You are not authorized to create a medical record for this patient.",
+                    "error",
+                    "fa-solid fa-shield-halved"
+                );
+
+
+                return;
+
+            }
+
+
+            /*
+             * VALIDATION ERROR
+             */
+
+            if (
+                response.status === 400
+            ) {
+
+                let message =
+                    "Please check the information entered.";
+
+
+                try {
+
+                    const errorData =
+                        await response.json();
+
+
+                    if (
+                        errorData.message
+                    ) {
+
+                        message =
+                            errorData.message;
+
+                    }
+
+                    else if (
+                        errorData.error
+                    ) {
+
+                        message =
+                            errorData.error;
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.warn(
+                        "Could not read validation response.",
+                        error
+                    );
+
+                }
+
+
+                showMessage(
+                    message,
+                    "error",
+                    "fa-solid fa-circle-exclamation"
+                );
+
+
+                return;
+
+            }
+
+
+            /*
+             * OTHER SERVER ERROR
+             */
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    "HTTP "
+                    +
+                    response.status
+                );
+
+            }
+
+
+            /*
+             * SUCCESS
+             */
+
+            const savedRecord =
+                await response.json();
+
+
+            showMessage(
+                isEdit
+                    ? "Medical record updated successfully."
+                    : "Medical record created successfully.",
+                "success",
+                "fa-solid fa-circle-check"
+            );
+
+
+            /*
+             * Reset the form
+             */
+
+            document.getElementById(
+                "medicalRecordForm"
+            ).reset();
+
+
+            setDefaultDate();
+
+
+            document.getElementById(
+                "patientPreview"
+            ).style.display =
+                "none";
+
+
+            /*
+             * Redirect after short delay.
+             */
+
+            setTimeout(
+                function () {
+
+                    window.location.href =
+                        "/ui/medical-records";
+
+                },
+                1200
+            );
+
+
+            console.log(
+                isEdit
+                    ? "Medical record updated:"
+                    : "Medical record created:",
+                savedRecord
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Save medical record error:",
+                error
+            );
+
+
+            showMessage(
+                isEdit
+                    ? "Unable to update the medical record. Please try again."
+                    : "Unable to create the medical record. Please try again.",
+                "error",
+                "fa-solid fa-triangle-exclamation"
+            );
+
+        }
+
+        finally {
+
+            button.disabled =
+                false;
+
+
+            button.innerHTML = `
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Save Medical Record
+
+            `;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ACCESS DENIED
+    // =========================================================
+
+    function showAccessDenied() {
+
+        const content =
+            document.querySelector(
+                ".page-content"
+            );
+
+
+        content.innerHTML = `
+
+            <div class="card access-warning">
+
+                <i class="fa-solid fa-shield-halved"></i>
+
+                <h2>
+                    Access Denied
+                </h2>
+
+                <p>
+                    Patients cannot create medical records.
+                    Only authorized medical staff can add records.
+                </p>
+
+                <a href="/ui/medical-records"
+                   class="btn btn-primary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Medical Records
+
+                </a>
+
+            </div>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // SHOW MESSAGE
+    // =========================================================
+
+    function showMessage(
+        message,
+        type,
+        icon
+    ) {
+
+        const box =
+            document.getElementById(
+                "messageBox"
+            );
+
+
+        if (!box) {
+            return;
+        }
+
+
+        box.className =
+            "message-box "
+            +
+            type;
+
+
+        box.innerHTML = `
+
+            <i class="${icon}"></i>
+
+            ${escapeHtml(
+                message
+            )}
+
+        `;
+
+
+        box.style.display =
+            "block";
+
+
+        box.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+
+    }
+
+
+
+    // =========================================================
+    // FORMAT ROLE
+    // =========================================================
+
+    function formatRole(
+        role
+    ) {
+
+        role =
+            normalizeRole(
+                role
+            );
+
+
+        if (!role) {
+            return "User";
+        }
+
+
+        return role
+            .charAt(0)
+            .toUpperCase()
+            +
+            role
+                .substring(1)
+                .toLowerCase();
+
+    }
+
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(
+            value
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // COMING SOON
+    // =========================================================
+
+    function showComingSoon(
+        event,
+        page
+    ) {
+
+        event.preventDefault();
+
+
+        alert(
+            page
+            +
+            " will be available soon."
+        );
+
+    }
+
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+        localStorage.removeItem(
+            "jwtToken"
+        );
+
+        localStorage.removeItem(
+            "token"
+        );
+
+        localStorage.removeItem(
+            "accessToken"
+        );
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

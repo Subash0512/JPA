@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Billing | Hospital Management System</title>
+
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        .billing-patient {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .billing-patient-name {
+            font-weight: 700;
+        }
+
+        .billing-patient-id {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .billing-amount {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .billing-date {
+            white-space: nowrap;
+        }
+
+        .billing-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .billing-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .billing-message i {
+            display: block;
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-other {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .patient-info-card {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .patient-info-label {
+            color: #64748b;
+        }
+
+        .patient-info-name {
+            font-weight: 700;
+        }
+
+        .billing-modal-details {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .billing-detail-card {
+            padding: 15px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .billing-detail-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .billing-detail-value {
+            display: block;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 800px) {
+
+            .billing-modal-details {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>
+                    Patients
+                </span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>
+                    Doctors
+                </span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>
+                    Appointments
+                </span>
+
+            </a>
+
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>
+                    Medical Records
+                </span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>
+                    Billing
+                </span>
+
+            </a>
+
+
+           
+        </div>
+
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- HEADER -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1>
+                    Billing
+                </h1>
+
+                <p id="currentDate">
+                    Billing information
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+
+                <div class="search-box">
+
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+
+                    <input
+                        type="text"
+                        id="billingSearch"
+                        placeholder="Search billing records...">
+
+                </div>
+
+
+                <button type="button"
+                        class="header-icon notification">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+
+                        U
+
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+
+                            User
+
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+
+                            User
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- CONTENT -->
+
+        <section class="page-content">
+
+
+            <!-- INTRO -->
+
+            <div class="welcome-card">
+
+                <div>
+
+                    <div class="welcome-title">
+                        Billing
+                    </div>
+
+                    <div class="welcome-description"
+                         id="pageDescription">
+
+                        Manage patient billing information.
+
+                    </div>
+
+                </div>
+
+
+                <div class="quick-actions"
+                     id="generateBillContainer">
+
+                    <a href="/ui/bill-form"
+                       class="btn btn-primary">
+
+                        <i class="fa-solid fa-file-circle-plus"></i>
+
+                        Generate Bill
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PATIENT INFO -->
+
+            <div class="card"
+                 id="patientInfoCard"
+                 style="display:none; margin-bottom:20px;">
+
+                <div class="patient-info-card">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <span class="patient-info-label">
+                        Patient:
+                    </span>
+
+                    <span class="patient-info-name"
+                          id="currentPatientName">
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ADMIN SUMMARY -->
+
+            <div class="kpi-grid"
+                 id="adminSummary"
+                 style="display:none;">
+
+
+                <!-- TOTAL BILLS -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-header">
+
+                        <div class="kpi-title">
+                            Total Bills
+                        </div>
+
+                        <div class="kpi-icon">
+
+                            <i class="fa-solid fa-file-invoice"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="kpi-value"
+                         id="totalBills">
+                        0
+                    </div>
+
+
+                    <div class="kpi-change">
+
+                        <i class="fa-solid fa-receipt"></i>
+
+                        &nbsp; Billing records
+
+                    </div>
+
+
+                    <div class="kpi-description">
+                        All billing records
+                    </div>
+
+                </div>
+
+
+
+                <!-- TOTAL AMOUNT -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-header">
+
+                        <div class="kpi-title">
+                            Total Amount
+                        </div>
+
+                        <div class="kpi-icon">
+
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="kpi-value"
+                         id="totalAmount"
+                         style="font-size:20px;">
+
+                        ₹0.00
+
+                    </div>
+
+
+                    <div class="kpi-change">
+
+                        <i class="fa-solid fa-money-bill"></i>
+
+                        &nbsp; Billing amount
+
+                    </div>
+
+
+                    <div class="kpi-description">
+                        Total billed amount
+                    </div>
+
+                </div>
+
+
+
+                <!-- PAID -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-header">
+
+                        <div class="kpi-title">
+                            Paid
+                        </div>
+
+                        <div class="kpi-icon">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="kpi-value"
+                         id="paidBills">
+                        0
+                    </div>
+
+
+                    <div class="kpi-change">
+
+                        <i class="fa-solid fa-check"></i>
+
+                        &nbsp; Paid bills
+
+                    </div>
+
+
+                    <div class="kpi-description">
+                        Completed payments
+                    </div>
+
+                </div>
+
+
+
+                <!-- PENDING -->
+
+                <div class="kpi-card">
+
+                    <div class="kpi-header">
+
+                        <div class="kpi-title">
+                            Pending
+                        </div>
+
+                        <div class="kpi-icon">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="kpi-value"
+                         id="pendingBills">
+                        0
+                    </div>
+
+
+                    <div class="kpi-change">
+
+                        <i class="fa-solid fa-hourglass-half"></i>
+
+                        &nbsp; Pending bills
+
+                    </div>
+
+
+                    <div class="kpi-description">
+                        Awaiting payment
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- BILLING TABLE -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <div class="card-title">
+                            Billing Records
+                        </div>
+
+                        <div class="card-subtitle"
+                             id="tableSubtitle">
+
+                            Patient billing information
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="btn"
+                            onclick="loadBilling()">
+
+                        <i class="fa-solid fa-rotate"></i>
+
+                        Refresh
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead id="billingHeader">
+                        </thead>
+
+
+                        <tbody id="billingTable">
+
+                        <tr>
+
+                            <td colspan="5">
+
+                                <div class="loading">
+
+                                    Loading billing records...
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     BILL DETAILS MODAL
+     ========================================================= -->
+
+<div id="billModal"
+     class="modal"
+     style="display:none;">
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <div class="card-title">
+                    Billing Details
+                </div>
+
+                <div class="card-subtitle">
+                    Billing information
+                </div>
+
+            </div>
+
+
+            <button type="button"
+                    class="header-icon"
+                    onclick="closeBillModal()">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="billing-modal-details">
+
+
+                <div class="billing-detail-card">
+
+                    <span class="billing-detail-label">
+                        Patient
+                    </span>
+
+                    <span class="billing-detail-value"
+                          id="modalPatientName">
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="billing-detail-card">
+
+                    <span class="billing-detail-label">
+                        Amount
+                    </span>
+
+                    <span class="billing-detail-value"
+                          id="modalAmount">
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="billing-detail-card">
+
+                    <span class="billing-detail-label">
+                        Status
+                    </span>
+
+                    <span class="billing-detail-value"
+                          id="modalStatus">
+                        --
+                    </span>
+
+                </div>
+
+
+                <div class="billing-detail-card">
+
+                    <span class="billing-detail-label">
+                        Billing Date
+                    </span>
+
+                    <span class="billing-detail-value"
+                          id="modalBillingDate">
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button type="button"
+                    class="btn"
+                    onclick="closeBillModal()">
+
+                Close
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- API.JS -->
+
+<script th:src="@{/js/api.js}"></script>
+
+
+
+<script>
+
+    // =========================================================
+    // GLOBALS
+    // =========================================================
+
+    let billingRecords = [];
+    let currentRole = "";
+    let currentPatientId = null;
+    let currentPatientName = null;
+
+
+    // =========================================================
+    // INITIALIZATION
+    // =========================================================
+
+    document.addEventListener("DOMContentLoaded", async function () {
+
+        initializeDate();
+
+        currentRole = normalizeRole(getCurrentRole());
+
+        console.log("Billing role:", currentRole);
+
+        if (currentRole === "ADMIN") {
+
+            setupAdminPage();
+
+            loadProfile();
+
+            await loadBilling();
+
+        }
+
+        else if (currentRole === "PATIENT") {
+
+            setupPatientPage();
+
+            await loadPatientProfile();
+
+            await loadBilling();
+
+        }
+
+        setupSearch();
+
+    });
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
+
+    function initializeDate() {
+
+        const element =
+            document.getElementById("currentDate");
+
+        if (!element) {
+            return;
+        }
+
+        element.textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+    }
+
+
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    function getToken() {
+
+        return localStorage.getItem("token");
+
+    }
+
+
+    // =========================================================
+    // GET USER FROM JWT
+    // =========================================================
+
+    function getUserFromToken() {
+
+        const token = getToken();
+
+        if (!token) {
+            return null;
+        }
+
+        try {
+
+            const parts = token.split(".");
+
+            if (parts.length !== 3) {
+                return null;
+            }
+
+            return JSON.parse(
+                atob(
+                    parts[1]
+                        .replace(/-/g, "+")
+                        .replace(/_/g, "/")
+                )
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "JWT error:",
+                error
+            );
+
+            return null;
+        }
+    }
+
+
+    // =========================================================
+    // CURRENT ROLE
+    // =========================================================
+
+    function getCurrentRole() {
+
+        const user =
+            getUserFromToken();
+
+        if (!user) {
+            return "";
+        }
+
+        let role =
+            user.role
+            || user.roles
+            || user.authorities;
+
+        if (Array.isArray(role)) {
+            role = role[0];
+        }
+
+        if (
+            role &&
+            typeof role === "object"
+        ) {
+            role =
+                role.authority
+                || role.role;
+        }
+
+        return String(role || "");
+
+    }
+
+
+    // =========================================================
+    // NORMALIZE ROLE
+    // =========================================================
+
+    function normalizeRole(role) {
+
+        return String(role || "")
+            .replace("ROLE_", "")
+            .toUpperCase();
+
+    }
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function loadProfile() {
+
+        const user =
+            getUserFromToken();
+
+        const username =
+            user?.username
+            || user?.name
+            || user?.sub
+            || "User";
+
+        const profileName =
+            document.getElementById("profileName");
+
+        const profileRole =
+            document.getElementById("profileRole");
+
+        const profileAvatar =
+            document.getElementById("profileAvatar");
+
+        if (profileName) {
+            profileName.textContent =
+                username;
+        }
+
+        if (profileRole) {
+            profileRole.textContent =
+                formatRole(currentRole);
+        }
+
+        if (profileAvatar) {
+            profileAvatar.textContent =
+                username
+                    .charAt(0)
+                    .toUpperCase();
+        }
+
+    }
+
+
+    // =========================================================
+    // PATIENT PROFILE
+    // =========================================================
+
+    async function loadPatientProfile() {
+
+        try {
+
+            const patient =
+                await apiGet("/patients/me");
+
+            currentPatientId =
+                patient?.id || null;
+
+            currentPatientName =
+                patient?.name || null;
+
+            const patientInfoCard =
+                document.getElementById(
+                    "patientInfoCard"
+                );
+
+            const currentPatientNameElement =
+                document.getElementById(
+                    "currentPatientName"
+                );
+
+            if (currentPatientName) {
+
+                if (patientInfoCard) {
+                    patientInfoCard.style.display =
+                        "block";
+                }
+
+                if (currentPatientNameElement) {
+                    currentPatientNameElement.textContent =
+                        currentPatientName;
+                }
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Unable to load patient profile:",
+                error
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // ADMIN PAGE
+    // =========================================================
+
+    function setupAdminPage() {
+
+        const adminSummary =
+            document.getElementById(
+                "adminSummary"
+            );
+
+        const generateBillContainer =
+            document.getElementById(
+                "generateBillContainer"
+            );
+
+        const pageDescription =
+            document.getElementById(
+                "pageDescription"
+            );
+
+        const tableSubtitle =
+            document.getElementById(
+                "tableSubtitle"
+            );
+
+        if (adminSummary) {
+            adminSummary.style.display =
+                "grid";
+        }
+
+        if (generateBillContainer) {
+            generateBillContainer.style.display =
+                "flex";
+        }
+
+        if (pageDescription) {
+            pageDescription.textContent =
+                "Manage patient billing information.";
+        }
+
+        if (tableSubtitle) {
+            tableSubtitle.textContent =
+                "All patient billing records";
+        }
+
+        const header =
+            document.getElementById(
+                "billingHeader"
+            );
+
+        if (header) {
+
+            header.innerHTML = `
+                <tr>
+                    <th>Patient</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Billing Date</th>
+                    <th>Actions</th>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    // =========================================================
+    // PATIENT PAGE
+    // =========================================================
+
+    function setupPatientPage() {
+
+        const adminSummary =
+            document.getElementById(
+                "adminSummary"
+            );
+
+        const generateBillContainer =
+            document.getElementById(
+                "generateBillContainer"
+            );
+
+        const pageDescription =
+            document.getElementById(
+                "pageDescription"
+            );
+
+        const tableSubtitle =
+            document.getElementById(
+                "tableSubtitle"
+            );
+
+        if (adminSummary) {
+            adminSummary.style.display =
+                "none";
+        }
+
+        if (generateBillContainer) {
+            generateBillContainer.style.display =
+                "none";
+        }
+
+        if (pageDescription) {
+            pageDescription.textContent =
+                "View your billing information.";
+        }
+
+        if (tableSubtitle) {
+            tableSubtitle.textContent =
+                "Your billing records";
+        }
+
+        const header =
+            document.getElementById(
+                "billingHeader"
+            );
+
+        if (header) {
+
+            header.innerHTML = `
+                <tr>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Billing Date</th>
+                    <th>Actions</th>
+                </tr>
+            `;
+
+        }
+
+    }
+
+
+    // =========================================================
+    // LOAD BILLING
+    // =========================================================
+
+    async function loadBilling() {
+
+        const table =
+            document.getElementById(
+                "billingTable"
+            );
+
+        if (!table) {
+            return;
+        }
+
+        const token =
+            getToken();
+
+        if (!token) {
+
+            showMessage(
+                "Please login again.",
+                "fa-solid fa-right-to-bracket"
+            );
+
+            return;
+        }
+
+        let url =
+            "/billing";
+
+        if (currentRole === "PATIENT") {
+            url = "/billing/me";
+        }
+
+        else if (currentRole !== "ADMIN") {
+            return;
+        }
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="${currentRole === "PATIENT" ? 4 : 5}">
+                    <div class="loading">
+                        Loading billing records...
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization":
+                                "Bearer " + token,
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+            if (response.status === 401) {
+
+                showMessage(
+                    "Your session has expired. Please login again.",
+                    "fa-solid fa-lock"
+                );
+
+                return;
+            }
+
+            if (response.status === 403) {
+
+                showMessage(
+                    "You are not authorized to view these billing records.",
+                    "fa-solid fa-shield-halved"
+                );
+
+                return;
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "HTTP " +
+                    response.status
+                );
+
+            }
+
+            const data =
+                await response.json();
+
+            billingRecords =
+                Array.isArray(data)
+                    ? data
+                    : [];
+
+            renderBillingRecords(
+                billingRecords
+            );
+
+            if (currentRole === "ADMIN") {
+
+                updateAdminSummary(
+                    billingRecords
+                );
+
+            }
+
+        }
+        catch (error) {
+
+            console.error(
+                "Billing loading error:",
+                error
+            );
+
+            showMessage(
+                "Unable to load billing records.",
+                "fa-solid fa-triangle-exclamation"
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // RENDER BILLING
+    // =========================================================
+
+    function renderBillingRecords(records) {
+
+        const table =
+            document.getElementById(
+                "billingTable"
+            );
+
+        if (!table) {
+            return;
+        }
+
+        table.innerHTML = "";
+
+        if (
+            !Array.isArray(records)
+            ||
+            records.length === 0
+        ) {
+
+            showMessage(
+                "No billing records found.",
+                "fa-solid fa-file-invoice"
+            );
+
+            return;
+        }
+
+        records.forEach(function (bill) {
+
+            const patient =
+                bill.patient || {};
+
+            const patientName =
+                patient.name
+                ||
+                currentPatientName
+                ||
+                "Unknown Patient";
+
+            const patientId =
+                patient.id ?? "--";
+
+            const amount =
+                formatCurrency(
+                    bill.amount
+                );
+
+            const status =
+                bill.status
+                ||
+                "Pending";
+
+            const billingDate =
+                formatDate(
+                    bill.billingDate
+                );
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+            if (currentRole === "PATIENT") {
+
+                row.innerHTML = `
+                    <td>
+                        <span class="billing-amount">
+                            ${escapeHtml(amount)}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${createStatusBadge(status)}
+                    </td>
+
+                    <td>
+                        <span class="billing-date">
+                            ${escapeHtml(billingDate)}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="billing-actions">
+
+                            <button
+                                type="button"
+                                class="btn"
+                                onclick="viewBill(${Number(bill.id)})">
+
+                                <i class="fa-solid fa-eye"></i>
+                                View
+
+                            </button>
+
+                        </div>
+                    </td>
+                `;
+
+            }
+
+            else {
+
+                row.innerHTML = `
+                    <td>
+
+                        <div class="billing-patient">
+
+                            <span class="billing-patient-name">
+                                ${escapeHtml(patientName)}
+                            </span>
+
+                            <span class="billing-patient-id">
+                                Patient ID:
+                                ${escapeHtml(patientId)}
+                            </span>
+
+                        </div>
+
+                    </td>
+
+                    <td>
+                        <span class="billing-amount">
+                            ${escapeHtml(amount)}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${createStatusBadge(status)}
+                    </td>
+
+                    <td>
+                        <span class="billing-date">
+                            ${escapeHtml(billingDate)}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        <div class="billing-actions">
+
+                            <button
+                                type="button"
+                                class="btn"
+                                onclick="viewBill(${Number(bill.id)})">
+
+                                <i class="fa-solid fa-eye"></i>
+                                View
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn"
+                                onclick="changeStatus(${Number(bill.id)})">
+
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Status
+
+                            </button>
+
+                        </div>
+
+                    </td>
+                `;
+
+            }
+
+            table.appendChild(row);
+
+        });
+
+    }
+
+
+    // =========================================================
+    // STATUS BADGE
+    // =========================================================
+
+    function createStatusBadge(status) {
+
+        const normalized =
+            String(
+                status || "Pending"
+            ).toLowerCase();
+
+        let className =
+            "status-other";
+
+        if (normalized === "paid") {
+            className =
+                "status-paid";
+        }
+
+        else if (normalized === "pending") {
+            className =
+                "status-pending";
+        }
+
+        return `
+            <span class="status ${className}">
+                ${escapeHtml(status || "Pending")}
+            </span>
+        `;
+
+    }
+
+
+    // =========================================================
+    // ADMIN SUMMARY
+    // =========================================================
+
+    function updateAdminSummary(records) {
+
+        const list =
+            Array.isArray(records)
+                ? records
+                : [];
+
+        let totalAmount = 0;
+        let paid = 0;
+        let pending = 0;
+
+        list.forEach(function (bill) {
+
+            totalAmount +=
+                Number(
+                    bill.amount || 0
+                );
+
+            const status =
+                String(
+                    bill.status || ""
+                ).toLowerCase();
+
+            if (status === "paid") {
+                paid++;
+            }
+
+            else if (status === "pending") {
+                pending++;
+            }
+
+        });
+
+        const totalBills =
+            document.getElementById(
+                "totalBills"
+            );
+
+        const totalAmountElement =
+            document.getElementById(
+                "totalAmount"
+            );
+
+        const paidBills =
+            document.getElementById(
+                "paidBills"
+            );
+
+        const pendingBills =
+            document.getElementById(
+                "pendingBills"
+            );
+
+        if (totalBills) {
+            totalBills.textContent =
+                list.length;
+        }
+
+        if (totalAmountElement) {
+            totalAmountElement.textContent =
+                formatCurrency(totalAmount);
+        }
+
+        if (paidBills) {
+            paidBills.textContent =
+                paid;
+        }
+
+        if (pendingBills) {
+            pendingBills.textContent =
+                pending;
+        }
+
+    }
+
+
+    // =========================================================
+    // VIEW BILL
+    // =========================================================
+
+    async function viewBill(billId) {
+
+        let bill =
+            billingRecords.find(
+                function (item) {
+
+                    return String(item.id)
+                        === String(billId);
+
+                }
+            );
+
+        if (!bill) {
+
+            try {
+
+                bill =
+                    await apiGet(
+                        "/billing/" +
+                        encodeURIComponent(billId)
+                    );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Unable to load billing details:",
+                    error
+                );
+
+            }
+
+        }
+
+        if (!bill) {
+
+            showMessage(
+                "Billing record not found.",
+                "fa-solid fa-circle-exclamation"
+            );
+
+            return;
+        }
+
+        const patient =
+            bill.patient || {};
+
+        const patientNameElement =
+            document.getElementById(
+                "modalPatientName"
+            );
+
+        const modalAmount =
+            document.getElementById(
+                "modalAmount"
+            );
+
+        const modalStatus =
+            document.getElementById(
+                "modalStatus"
+            );
+
+        const modalBillingDate =
+            document.getElementById(
+                "modalBillingDate"
+            );
+
+        if (patientNameElement) {
+            patientNameElement.textContent =
+                patient.name
+                ||
+                currentPatientName
+                ||
+                "Unknown Patient";
+        }
+
+        if (modalAmount) {
+            modalAmount.textContent =
+                formatCurrency(
+                    bill.amount
+                );
+        }
+
+        if (modalStatus) {
+            modalStatus.innerHTML =
+                createStatusBadge(
+                    bill.status
+                );
+        }
+
+        if (modalBillingDate) {
+            modalBillingDate.textContent =
+                formatDate(
+                    bill.billingDate
+                );
+        }
+
+        const modal =
+            document.getElementById(
+                "billModal"
+            );
+
+        if (modal) {
+            modal.style.display =
+                "flex";
+        }
+
+    }
+
+
+    // =========================================================
+    // CHANGE STATUS
+    // =========================================================
+
+    async function changeStatus(billId) {
+
+        if (currentRole !== "ADMIN") {
+            return;
+        }
+
+        const bill =
+            billingRecords.find(
+                function (item) {
+
+                    return String(item.id)
+                        === String(billId);
+
+                }
+            );
+
+        if (!bill) {
+            return;
+        }
+
+        const input =
+            prompt(
+                "Enter payment status: Paid or Pending",
+                bill.status || "Pending"
+            );
+
+        if (input === null) {
+            return;
+        }
+
+        const status =
+            input.trim();
+
+        if (
+            status.toLowerCase() !== "paid"
+            &&
+            status.toLowerCase() !== "pending"
+        ) {
+
+            alert(
+                "Status must be Paid or Pending."
+            );
+
+            return;
+        }
+
+        const token =
+            getToken();
+
+        try {
+
+            const response =
+                await fetch(
+                    "/billing/" +
+                    encodeURIComponent(billId) +
+                    "/status?status=" +
+                    encodeURIComponent(status),
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Authorization":
+                                "Bearer " + token
+                        }
+                    }
+                );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "HTTP " +
+                    response.status
+                );
+
+            }
+
+            const updatedBill =
+                await response.json();
+
+            const index =
+                billingRecords.findIndex(
+                    function (item) {
+
+                        return String(item.id)
+                            === String(billId);
+
+                    }
+                );
+
+            if (index !== -1) {
+
+                billingRecords[index] =
+                    updatedBill;
+
+            }
+
+            renderBillingRecords(
+                billingRecords
+            );
+
+            updateAdminSummary(
+                billingRecords
+            );
+
+            alert(
+                "Payment status updated successfully."
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Payment status error:",
+                error
+            );
+
+            alert(
+                "Unable to update payment status."
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // SEARCH
+    // =========================================================
+
+    function setupSearch() {
+
+        const search =
+            document.getElementById(
+                "billingSearch"
+            );
+
+        if (!search) {
+            return;
+        }
+
+        search.addEventListener(
+            "input",
+            function () {
+
+                const query =
+                    search.value
+                        .trim()
+                        .toLowerCase();
+
+                if (!query) {
+
+                    renderBillingRecords(
+                        billingRecords
+                    );
+
+                    return;
+                }
+
+                const filtered =
+                    billingRecords.filter(
+                        function (bill) {
+
+                            const patient =
+                                bill.patient || {};
+
+                            const text = [
+                                patient.name,
+                                patient.id,
+                                bill.amount,
+                                bill.status,
+                                bill.billingDate
+                            ]
+                            .filter(
+                                value =>
+                                    value !== null
+                                    &&
+                                    value !== undefined
+                            )
+                            .join(" ")
+                            .toLowerCase();
+
+                            return text.includes(
+                                query
+                            );
+
+                        }
+                    );
+
+                renderBillingRecords(
+                    filtered
+                );
+
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // CLOSE MODAL
+    // =========================================================
+
+    function closeBillModal() {
+
+        const modal =
+            document.getElementById(
+                "billModal"
+            );
+
+        if (modal) {
+            modal.style.display =
+                "none";
+        }
+
+    }
+
+
+    // =========================================================
+    // FORMAT CURRENCY
+    // =========================================================
+
+    function formatCurrency(amount) {
+
+        return Number(
+            amount || 0
+        ).toLocaleString(
+            "en-IN",
+            {
+                style: "currency",
+                currency: "INR",
+                minimumFractionDigits: 2
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // FORMAT DATE
+    // =========================================================
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "--";
+        }
+
+        const date =
+            new Date(value);
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+            return String(value);
+        }
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    }
+
+
+    // =========================================================
+    // FORMAT ROLE
+    // =========================================================
+
+    function formatRole(role) {
+
+        role =
+            normalizeRole(role);
+
+        if (!role) {
+            return "User";
+        }
+
+        return role
+            .charAt(0)
+            .toUpperCase()
+            +
+            role
+                .substring(1)
+                .toLowerCase();
+
+    }
+
+
+    // =========================================================
+    // SHOW MESSAGE
+    // =========================================================
+
+    function showMessage(message, icon) {
+
+        const table =
+            document.getElementById(
+                "billingTable"
+            );
+
+        if (!table) {
+            return;
+        }
+
+        const colspan =
+            currentRole === "PATIENT"
+                ? 4
+                : 5;
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="${colspan}">
+                    <div class="billing-message">
+                        <i class="${icon}"></i>
+                        ${escapeHtml(message)}
+                    </div>
+                </td>
+            </tr>
+        `;
+
+    }
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(value) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+        localStorage.removeItem("token");
+
+        window.location.href =
+            "/login";
+
+    }
+
+
+    // =========================================================
+    // MODAL OUTSIDE CLICK
+    // =========================================================
+
+    window.addEventListener(
+        "click",
+        function (event) {
+
+            const modal =
+                document.getElementById(
+                    "billModal"
+                );
+
+            if (
+                modal
+                &&
+                event.target === modal
+            ) {
+
+                closeBillModal();
+
+            }
+
+        }
+    );
+
+
+    window.viewBill = viewBill;
+    window.changeStatus = changeStatus;
+    window.closeBillModal = closeBillModal;
+
+</script>
+</body>
+
+</html>

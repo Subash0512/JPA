@@ -1,0 +1,114 @@
+@charset "UTF-8";
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid,
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-box {
+        width: 220px;
+    }
+}
+
+@media (max-width: 850px) {
+
+    .sidebar {
+        width: 68px;
+    }
+
+    .sidebar-brand {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .brand-text,
+    .nav-section-title,
+    .nav-item span:not(.nav-icon),
+    .system-status {
+        display: none;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .nav-icon {
+        margin: 0;
+    }
+
+    .nav-badge {
+        display: none;
+    }
+
+    .main-wrapper {
+        margin-left: 68px;
+
+        width: calc(100% - 68px);
+    }
+
+    .quick-actions {
+        flex-wrap: wrap;
+    }
+
+    .welcome-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 14px;
+    }
+
+    .header-right .search-box {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .app-header {
+        padding: 0 12px;
+    }
+
+    .page-content {
+        padding: 12px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-info {
+        display: none;
+    }
+
+    .welcome-card {
+        padding: 14px;
+    }
+
+    .quick-actions {
+        width: 100%;
+    }
+
+    .quick-actions .btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full {
+        grid-column: auto;
+    }
+}

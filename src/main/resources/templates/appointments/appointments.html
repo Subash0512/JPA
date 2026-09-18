@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Appointments | Hospital Management System</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        .appointment-page-card {
+            width: 100%;
+        }
+
+        .page-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .toolbar-subtitle {
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .toolbar-search {
+            min-width: 260px;
+        }
+
+        .toolbar-search input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .toolbar-search input:focus {
+            border-color: #2563eb;
+        }
+
+        .primary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .primary-button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border: 0;
+            border-radius: 8px;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .secondary-button:hover {
+            background: #e5e7eb;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .appointments-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .appointments-table th {
+            text-align: left;
+            padding: 13px 14px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .appointments-table td {
+            padding: 14px;
+            border-bottom: 1px solid #eef2f7;
+            color: #111827;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .person-name {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .person-secondary {
+            display: block;
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .status-scheduled {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-completed {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+
+        .status-cancelled {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .status-default {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .icon-button {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #e5e7eb;
+            border-radius: 7px;
+            background: #fff;
+            color: #475569;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button:hover {
+            background: #f8fafc;
+        }
+
+        .icon-button.delete {
+            color: #dc2626;
+        }
+
+        .icon-button.delete:hover {
+            background: #fef2f2;
+        }
+
+        .loading-state,
+        .empty-state,
+        .error-state {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .loading-state i,
+        .empty-state i,
+        .error-state i {
+            display: block;
+            font-size: 40px;
+            margin-bottom: 14px;
+        }
+
+        .empty-state i {
+            color: #94a3b8;
+        }
+
+        .error-state i {
+            color: #dc2626;
+        }
+
+        .loading-state p,
+        .empty-state p,
+        .error-state p {
+            color: #64748b;
+        }
+
+        .message {
+            display: none;
+            margin: 18px;
+            padding: 11px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .message.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #166534;
+        }
+
+        @media (max-width: 750px) {
+
+            .toolbar-left {
+                width: 100%;
+            }
+
+            .toolbar-search {
+                width: 100%;
+                min-width: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>
+                    Patients
+                </span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               id="doctorsNav"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>
+                    Doctors
+                </span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>
+                    Appointments
+                </span>
+
+            </a>
+
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>
+                    Medical Records
+                </span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>
+                    Billing
+                </span>
+
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- HEADER -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1>
+                    Appointments
+                </h1>
+
+                <p id="currentDate">
+                    Appointment management
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        id="globalSearch"
+                        placeholder="Search patients, doctors...">
+
+                </div>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+                        U
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+                            User
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+                            User
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             CONTENT
+             ===================================================== -->
+
+        <section class="page-content">
+
+
+            <div class="card appointment-page-card">
+
+
+                <!-- TOOLBAR -->
+
+                <div class="card-header">
+
+                    <div class="page-toolbar">
+
+
+                        <div class="toolbar-left">
+
+                            <div>
+
+                                <div class="toolbar-title">
+                                    Appointment List
+                                </div>
+
+                                <div class="toolbar-subtitle"
+                                     id="appointmentSubtitle">
+                                    Manage appointments
+                                </div>
+
+                            </div>
+
+
+                            <div class="toolbar-search">
+
+                                <input
+                                    type="text"
+                                    id="appointmentSearch"
+                                    placeholder="Search by patient, doctor or status...">
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div id="addAppointmentContainer">
+
+                            <a href="/ui/appointment-form"
+                               class="primary-button">
+
+                                <i class="fa-solid fa-calendar-plus"></i>
+
+                                <span id="addAppointmentText">
+                                    New Appointment
+                                </span>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MESSAGES -->
+
+                <div id="errorMessage"
+                     class="message error">
+                </div>
+
+
+                <div id="successMessage"
+                     class="message success">
+                </div>
+
+
+
+                <!-- TABLE -->
+
+                <div class="table-wrapper">
+
+                    <table class="appointments-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>
+                                Patient
+                            </th>
+
+                            <th>
+                                Doctor
+                            </th>
+
+                            <th>
+                                Date & Time
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="appointmentsTable">
+
+                        <tr>
+
+                            <td colspan="5">
+
+                                <div class="loading-state">
+
+                                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                                    <h3>
+                                        Loading appointments...
+                                    </h3>
+
+                                    <p>
+                                        Please wait.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<script th:src="@{/js/api.js}"></script>
+
+
+<script>
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
+    let appointments = [];
+
+    let currentRole = "";
+
+
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async function () {
+
+            initializeDate();
+
+            initializeProfile();
+
+            currentRole =
+                normalizeRole(
+                    getCurrentRole()
+                );
+
+            configurePage();
+
+            initializeSearch();
+
+            await loadAppointments();
+
+        }
+    );
+
+
+
+    // =========================================================
+    // DATE
+    // =========================================================
+
+    function initializeDate() {
+
+        const element =
+            document.getElementById("currentDate");
+
+        if (!element) {
+            return;
+        }
+
+        element.textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+
+    }
+
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function initializeProfile() {
+
+        const role =
+            normalizeRole(
+                getCurrentRole()
+            );
+
+
+        const name =
+            localStorage.getItem("displayName")
+            ||
+            localStorage.getItem("username")
+            ||
+            "User";
+
+
+        const profileName =
+            document.getElementById("profileName");
+
+        const profileRole =
+            document.getElementById("profileRole");
+
+        const profileAvatar =
+            document.getElementById("profileAvatar");
+
+
+        if (profileName) {
+
+            profileName.textContent =
+                name;
+
+        }
+
+
+        if (profileRole) {
+
+            profileRole.textContent =
+                formatRole(role);
+
+        }
+
+
+        if (profileAvatar) {
+
+            profileAvatar.textContent =
+                name.charAt(0).toUpperCase();
+
+        }
+
+
+        const doctorsNav =
+            document.getElementById(
+                "doctorsNav"
+            );
+
+
+        if (
+            doctorsNav
+            &&
+            role !== "ADMIN"
+            &&
+            role !== "RECEPTIONIST"
+        ) {
+
+            doctorsNav.style.display =
+                "none";
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // PAGE CONFIGURATION
+    // =========================================================
+
+    function configurePage() {
+
+        const addContainer =
+            document.getElementById(
+                "addAppointmentContainer"
+            );
+
+
+        const addText =
+            document.getElementById(
+                "addAppointmentText"
+            );
+
+
+        const subtitle =
+            document.getElementById(
+                "appointmentSubtitle"
+            );
+
+
+        if (
+            currentRole === "PATIENT"
+        ) {
+
+            if (addText) {
+
+                addText.textContent =
+                    "Book Appointment";
+
+            }
+
+
+            if (subtitle) {
+
+                subtitle.textContent =
+                    "Your appointments";
+
+            }
+
+        }
+
+
+        else if (
+            currentRole === "DOCTOR"
+        ) {
+
+            if (addText) {
+
+                addText.textContent =
+                    "New Appointment";
+
+            }
+
+
+            if (subtitle) {
+
+                subtitle.textContent =
+                    "Appointments assigned to you";
+
+            }
+
+        }
+
+
+        else {
+
+            if (addText) {
+
+                addText.textContent =
+                    "New Appointment";
+
+            }
+
+
+            if (subtitle) {
+
+                subtitle.textContent =
+                    "Manage all hospital appointments";
+
+            }
+
+        }
+
+
+        if (
+            currentRole !== "ADMIN"
+            &&
+            currentRole !== "RECEPTIONIST"
+            &&
+            currentRole !== "DOCTOR"
+            &&
+            currentRole !== "PATIENT"
+        ) {
+
+            if (addContainer) {
+
+                addContainer.style.display =
+                    "none";
+
+            }
+
+        }
+
+
+        /*
+         * Doctors can view/manage their assigned appointments.
+         * Appointment creation remains disabled for Doctor here.
+         */
+
+        if (
+            currentRole === "DOCTOR"
+        ) {
+
+            if (addContainer) {
+
+                addContainer.style.display =
+                    "none";
+
+            }
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // SEARCH
+    // =========================================================
+
+    function initializeSearch() {
+
+        const searchInputs = [
+
+            document.getElementById(
+                "appointmentSearch"
+            ),
+
+            document.getElementById(
+                "globalSearch"
+            )
+
+        ];
+
+
+        searchInputs.forEach(
+            function (input) {
+
+                if (!input) {
+                    return;
+                }
+
+
+                input.addEventListener(
+                    "input",
+                    function () {
+
+                        const value =
+                            this.value;
+
+
+                        searchInputs.forEach(
+                            function (other) {
+
+                                if (
+                                    other
+                                    &&
+                                    other !== input
+                                ) {
+
+                                    other.value =
+                                        value;
+
+                                }
+
+                            }
+                        );
+
+
+                        filterAppointments(
+                            value
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // =========================================================
+    // LOAD APPOINTMENTS
+    // =========================================================
+
+    async function loadAppointments() {
+
+        showLoading();
+
+        hideMessages();
+
+
+        try {
+
+            const role =
+                normalizeRole(
+                    getCurrentRole()
+                );
+
+
+            let url =
+                "/appointments";
+
+
+            /*
+             * IMPORTANT:
+             * Patient must only receive
+             * their own appointments.
+             */
+
+            if (
+                role === "PATIENT"
+            ) {
+
+                url =
+                    "/appointments/me";
+
+            }
+
+
+            const response =
+                await apiGet(url);
+
+
+            appointments =
+                normalizeList(
+                    response
+                );
+
+
+            renderAppointments(
+                appointments
+            );
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Failed to load appointments:",
+                error
+            );
+
+
+            showError(
+                error.message
+                ||
+                "Unable to load appointments."
+            );
+
+
+            showErrorRow();
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // RENDER
+    // =========================================================
+
+    function renderAppointments(
+        list
+    ) {
+
+        const table =
+            document.getElementById(
+                "appointmentsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML =
+            "";
+
+
+        if (
+            !list.length
+        ) {
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td colspan="5">
+
+                        <div class="empty-state">
+
+                            <i class="fa-regular fa-calendar-xmark"></i>
+
+                            <h3>
+                                No appointments found
+                            </h3>
+
+                            <p>
+                                There are no appointments to display.
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+
+            return;
+
+        }
+
+
+
+        list.forEach(
+            function (appointment) {
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                const patient =
+                    appointment.patient
+                    ||
+                    {};
+
+
+                const doctor =
+                    appointment.doctor
+                    ||
+                    {};
+
+
+                const patientName =
+                    patient.name
+                    ||
+                    "--";
+
+
+                const doctorName =
+                    doctor.name
+                    ||
+                    "--";
+
+
+                const specialization =
+                    doctor.specialization
+                    ||
+                    "";
+
+
+                const appointmentTime =
+                    appointment.appointmentTime
+                    ||
+                    "";
+
+
+                const status =
+                    appointment.status
+                    ||
+                    "Scheduled";
+
+
+                const canEdit =
+                    currentRole === "ADMIN"
+                    ||
+                    currentRole === "RECEPTIONIST"
+                    ||
+                    currentRole === "DOCTOR"
+                    ||
+                    currentRole === "PATIENT";
+
+
+                const canDelete =
+                    currentRole === "ADMIN"
+                    ||
+                    currentRole === "RECEPTIONIST"
+                    ||
+                    currentRole === "DOCTOR"
+                    ||
+                    currentRole === "PATIENT";
+
+
+
+                let actions = `
+
+                    <button
+                        type="button"
+                        class="icon-button"
+                        title="View appointment"
+                        onclick="viewAppointment(${appointment.id})">
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </button>
+
+                `;
+
+
+
+                if (
+                    canEdit
+                ) {
+
+                    actions += `
+
+                        <button
+                            type="button"
+                            class="icon-button"
+                            title="Edit appointment"
+                            onclick="editAppointment(${appointment.id})">
+
+                            <i class="fa-solid fa-pen"></i>
+
+                        </button>
+
+                    `;
+
+                }
+
+
+
+                if (
+                    canDelete
+                ) {
+
+                    actions += `
+
+                        <button
+                            type="button"
+                            class="icon-button delete"
+                            title="Delete appointment"
+                            onclick="deleteAppointment(${appointment.id})">
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    `;
+
+                }
+
+
+
+                row.innerHTML = `
+
+                    <td>
+
+                        <span class="person-name">
+
+                            ${escapeHtml(
+                                patientName
+                            )}
+
+                        </span>
+
+
+                        ${
+                            patient.email
+                            ?
+                            `
+
+                                <span class="person-secondary">
+
+                                    ${escapeHtml(
+                                        patient.email
+                                    )}
+
+                                </span>
+
+                            `
+                            :
+                            ""
+                        }
+
+                    </td>
+
+
+
+                    <td>
+
+                        <span class="person-name">
+
+                            ${escapeHtml(
+                                doctorName
+                            )}
+
+                        </span>
+
+
+                        ${
+                            specialization
+                            ?
+                            `
+
+                                <span class="person-secondary">
+
+                                    ${escapeHtml(
+                                        specialization
+                                    )}
+
+                                </span>
+
+                            `
+                            :
+                            ""
+                        }
+
+                    </td>
+
+
+
+                    <td>
+
+                        ${
+                            appointmentTime
+                            ?
+                            escapeHtml(
+                                formatDateTime(
+                                    appointmentTime
+                                )
+                            )
+                            :
+                            "--"
+                        }
+
+                    </td>
+
+
+
+                    <td>
+
+                        <span class="status-badge ${getStatusClass(status)}">
+
+                            ${escapeHtml(
+                                status
+                            )}
+
+                        </span>
+
+                    </td>
+
+
+
+                    <td>
+
+                        <div class="action-group">
+
+                            ${actions}
+
+                        </div>
+
+                    </td>
+
+                `;
+
+
+                table.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // =========================================================
+    // FILTER
+    // =========================================================
+
+    function filterAppointments(
+        value
+    ) {
+
+        const query =
+            String(
+                value
+                ||
+                ""
+            )
+            .trim()
+            .toLowerCase();
+
+
+        if (!query) {
+
+            renderAppointments(
+                appointments
+            );
+
+            return;
+
+        }
+
+
+        const filtered =
+            appointments.filter(
+                function (appointment) {
+
+                    const patient =
+                        appointment.patient
+                        ||
+                        {};
+
+
+                    const doctor =
+                        appointment.doctor
+                        ||
+                        {};
+
+
+                    return (
+
+                        String(
+                            patient.name
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                        ||
+
+                        String(
+                            patient.email
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                        ||
+
+                        String(
+                            doctor.name
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                        ||
+
+                        String(
+                            doctor.specialization
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                        ||
+
+                        String(
+                            appointment.status
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                        ||
+
+                        String(
+                            appointment.appointmentTime
+                            ||
+                            ""
+                        )
+                        .toLowerCase()
+                        .includes(query)
+
+                    );
+
+                }
+            );
+
+
+        renderAppointments(
+            filtered
+        );
+
+    }
+
+
+
+    // =========================================================
+    // VIEW
+    // =========================================================
+
+    async function viewAppointment(
+        appointmentId
+    ) {
+
+        let appointment =
+            appointments.find(
+                function (item) {
+
+                    return Number(item.id)
+                        ===
+                        Number(
+                            appointmentId
+                        );
+
+                }
+            );
+
+
+        if (!appointment) {
+
+            try {
+
+                appointment =
+                    await apiGet(
+                        "/appointments/"
+                        +
+                        encodeURIComponent(
+                            appointmentId
+                        )
+                    );
+
+            }
+
+            catch (error) {
+
+                showError(
+                    error.message
+                    ||
+                    "Unable to load appointment details."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        if (!appointment) {
+
+            showError(
+                "Appointment not found."
+            );
+
+            return;
+
+        }
+
+
+        const patient =
+            appointment.patient
+            ||
+            {};
+
+
+        const doctor =
+            appointment.doctor
+            ||
+            {};
+
+
+        const dateTime =
+            appointment.appointmentTime
+            ||
+            "--";
+
+
+        alert(
+
+            "Appointment Details\n\n"
+
+            +
+
+            "Patient: "
+            +
+
+            (
+                patient.name
+                ||
+                "--"
+            )
+
+            +
+
+            "\nDoctor: "
+            +
+
+            (
+                doctor.name
+                ||
+                "--"
+            )
+
+            +
+
+            "\nSpecialization: "
+            +
+
+            (
+                doctor.specialization
+                ||
+                "--"
+            )
+
+            +
+
+            "\nDate & Time: "
+            +
+
+            (
+                dateTime === "--"
+                ?
+                "--"
+                :
+                formatDateTime(
+                    dateTime
+                )
+            )
+
+            +
+
+            "\nStatus: "
+            +
+
+            (
+                appointment.status
+                ||
+                "Scheduled"
+            )
+
+        );
+
+    }
+
+
+
+    // =========================================================
+    // EDIT
+    // =========================================================
+
+    function editAppointment(
+        appointmentId
+    ) {
+
+        window.location.href =
+            "/ui/appointment-form?id="
+            +
+            encodeURIComponent(
+                appointmentId
+            );
+
+    }
+
+
+
+    // =========================================================
+    // DELETE
+    // =========================================================
+
+    async function deleteAppointment(
+        appointmentId
+    ) {
+
+        const appointment =
+            appointments.find(
+                function (item) {
+
+                    return Number(
+                        item.id
+                    )
+                    ===
+                    Number(
+                        appointmentId
+                    );
+
+                }
+            );
+
+
+        if (!appointment) {
+
+            showError(
+                "Appointment not found."
+            );
+
+            return;
+
+        }
+
+
+        const patientName =
+            appointment.patient?.name
+            ||
+            "this appointment";
+
+
+        const confirmed =
+            confirm(
+                "Delete the appointment for "
+                +
+                patientName
+                +
+                "?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await apiDelete(
+                "/appointments/"
+                +
+                appointmentId
+            );
+
+
+            showSuccess(
+                "Appointment deleted successfully."
+            );
+
+
+            await loadAppointments();
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Delete appointment error:",
+                error
+            );
+
+
+            showError(
+                error.message
+                ||
+                "Unable to delete appointment."
+            );
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // LOADING
+    // =========================================================
+
+    function showLoading() {
+
+        const table =
+            document.getElementById(
+                "appointmentsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td colspan="5">
+
+                    <div class="loading-state">
+
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+
+                        <h3>
+                            Loading appointments...
+                        </h3>
+
+                        <p>
+                            Please wait.
+                        </p>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // ERROR ROW
+    // =========================================================
+
+    function showErrorRow() {
+
+        const table =
+            document.getElementById(
+                "appointmentsTable"
+            );
+
+
+        if (!table) {
+            return;
+        }
+
+
+        table.innerHTML = `
+
+            <tr>
+
+                <td colspan="5">
+
+                    <div class="error-state">
+
+                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                        <h3>
+                            Unable to load appointments
+                        </h3>
+
+                        <p>
+                            Please refresh and try again.
+                        </p>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // STATUS CLASS
+    // =========================================================
+
+    function getStatusClass(
+        status
+    ) {
+
+        const normalized =
+            String(
+                status
+                ||
+                ""
+            )
+            .toLowerCase();
+
+
+        if (
+            normalized ===
+            "scheduled"
+        ) {
+
+            return "status-scheduled";
+
+        }
+
+
+        if (
+            normalized ===
+            "completed"
+        ) {
+
+            return "status-completed";
+
+        }
+
+
+        if (
+            normalized ===
+            "cancelled"
+            ||
+            normalized ===
+            "canceled"
+        ) {
+
+            return "status-cancelled";
+
+        }
+
+
+        return "status-default";
+
+    }
+
+
+
+    // =========================================================
+    // DATE/TIME
+    // =========================================================
+
+    function formatDateTime(
+        value
+    ) {
+
+        const date =
+            new Date(
+                value
+            );
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return value;
+
+        }
+
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    }
+
+
+
+    // =========================================================
+    // NORMALIZE LIST
+    // =========================================================
+
+    function normalizeList(
+        data
+    ) {
+
+        if (
+            Array.isArray(data)
+        ) {
+
+            return data;
+
+        }
+
+
+        if (
+            data
+            &&
+            Array.isArray(
+                data.content
+            )
+        ) {
+
+            return data.content;
+
+        }
+
+
+        return data
+            ?
+            [data]
+            :
+            [];
+
+    }
+
+
+
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    function getToken() {
+
+        return localStorage.getItem(
+            "token"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // JWT
+    // =========================================================
+
+    function getUserFromToken() {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            const parts =
+                token.split(".");
+
+
+            if (
+                parts.length !== 3
+            ) {
+
+                return null;
+
+            }
+
+
+            return JSON.parse(
+
+                atob(
+
+                    parts[1]
+                        .replace(
+                            /-/g,
+                            "+"
+                        )
+                        .replace(
+                            /_/g,
+                            "/"
+                        )
+
+                )
+
+            );
+
+        }
+
+
+        catch (error) {
+
+            return null;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ROLE
+    // =========================================================
+
+    function getCurrentRole() {
+
+        if (
+            typeof window.getUserRole ===
+            "function"
+        ) {
+
+            return window.getUserRole();
+
+        }
+
+
+        const user =
+            getUserFromToken();
+
+
+        if (!user) {
+
+            return "";
+
+        }
+
+
+        let role =
+            user.role
+            ||
+            user.roles
+            ||
+            user.authorities;
+
+
+        if (
+            Array.isArray(role)
+        ) {
+
+            role =
+                role[0];
+
+        }
+
+
+        if (
+            role
+            &&
+            typeof role === "object"
+        ) {
+
+            role =
+                role.authority
+                ||
+                role.role;
+
+        }
+
+
+        return String(
+            role
+            ||
+            ""
+        );
+
+    }
+
+
+
+    // =========================================================
+    // NORMALIZE ROLE
+    // =========================================================
+
+    function normalizeRole(
+        role
+    ) {
+
+        return String(
+            role
+            ||
+            ""
+        )
+        .replace(
+            "ROLE_",
+            ""
+        )
+        .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // CURRENT USERNAME
+    // =========================================================
+
+    function getCurrentUsername() {
+
+        const user =
+            getUserFromToken();
+
+
+        return user?.username
+            ||
+            user?.sub
+            ||
+            user?.name
+            ||
+            "";
+
+    }
+
+
+
+    // =========================================================
+    // FORMAT ROLE
+    // =========================================================
+
+    function formatRole(
+        role
+    ) {
+
+        role =
+            normalizeRole(
+                role
+            );
+
+
+        if (!role) {
+
+            return "User";
+
+        }
+
+
+        return role
+            .charAt(0)
+            .toUpperCase()
+            +
+            role
+                .substring(1)
+                .toLowerCase();
+
+    }
+
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(
+            value
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // MESSAGES
+    // =========================================================
+
+    function showError(
+        message
+    ) {
+
+        const error =
+            document.getElementById(
+                "errorMessage"
+            );
+
+
+        if (!error) {
+            return;
+        }
+
+
+        error.textContent =
+            message;
+
+
+        error.classList.add(
+            "show"
+        );
+
+
+        const success =
+            document.getElementById(
+                "successMessage"
+            );
+
+
+        if (success) {
+
+            success.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+
+
+    function showSuccess(
+        message
+    ) {
+
+        const success =
+            document.getElementById(
+                "successMessage"
+            );
+
+
+        if (!success) {
+            return;
+        }
+
+
+        success.textContent =
+            message;
+
+
+        success.classList.add(
+            "show"
+        );
+
+
+        const error =
+            document.getElementById(
+                "errorMessage"
+            );
+
+
+        if (error) {
+
+            error.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+
+
+    function hideMessages() {
+
+        const error =
+            document.getElementById(
+                "errorMessage"
+            );
+
+
+        const success =
+            document.getElementById(
+                "successMessage"
+            );
+
+
+        if (error) {
+
+            error.classList.remove(
+                "show"
+            );
+
+        }
+
+
+        if (success) {
+
+            success.classList.remove(
+                "show"
+            );
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+        localStorage.removeItem(
+            "token"
+        );
+
+
+        localStorage.removeItem(
+            "jwt"
+        );
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+
+    // Make functions available to inline onclick handlers
+
+    window.viewAppointment =
+        viewAppointment;
+
+    window.editAppointment =
+        editAppointment;
+
+    window.deleteAppointment =
+        deleteAppointment;
+
+    window.logout =
+        logout;
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Patient Details | Hospital Management System</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/responsive.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* =========================================================
+           PATIENT DETAILS
+           ========================================================= */
+
+        .details-card {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .patient-profile {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .patient-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 25px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .patient-heading {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .patient-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .patient-label {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .detail-item {
+            padding: 17px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            display: block;
+            font-size: 15px;
+            color: #0f172a;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .detail-icon {
+            margin-right: 7px;
+            color: #64748b;
+        }
+
+        .action-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .loading-state,
+        .error-state {
+            max-width: 700px;
+            margin: 50px auto;
+            text-align: center;
+            padding: 40px 25px;
+        }
+
+        .loading-state i,
+        .error-state i {
+            display: block;
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .error-state i {
+            color: #dc2626;
+        }
+
+        .error-state p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 750px) {
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item.full-width {
+                grid-column: auto;
+            }
+
+            .patient-profile {
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-logo">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    Hospital Management
+                </div>
+
+                <div class="brand-subtitle">
+                    Information System
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-content">
+
+            <div class="nav-section-title">
+                Main
+            </div>
+
+
+            <a href="/dashboard"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="/ui/patients"
+               class="nav-item active">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-hospital-user"></i>
+                </span>
+
+                <span>Patients</span>
+
+            </a>
+
+
+            <a href="/ui/doctors"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </span>
+
+                <span>Doctors</span>
+
+            </a>
+
+
+            <a href="/ui/appointments"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+
+                <span>Appointments</span>
+
+            </a>
+
+
+            <div class="nav-section-title clinical-section">
+                Clinical
+            </div>
+
+
+            <a href="/ui/medical-records"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-medical"></i>
+                </span>
+
+                <span>Medical Records</span>
+
+            </a>
+
+
+            <a href="/ui/billing"
+               class="nav-item">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </span>
+
+                <span>Billing</span>
+
+            </a>
+
+
+            <div class="nav-section-title system-section">
+                System
+            </div>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Reports')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+
+                <span>Reports</span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item"
+               onclick="showComingSoon(event, 'Settings')">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-gear"></i>
+                </span>
+
+                <span>Settings</span>
+
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-footer">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                System operational
+
+            </div>
+
+
+            <button type="button"
+                    class="logout-button"
+                    onclick="logout()">
+
+                <span class="nav-icon">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+
+                <span>Logout</span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="main-wrapper">
+
+
+        <!-- HEADER -->
+
+        <header class="app-header">
+
+            <div class="page-heading">
+
+                <h1>
+                    Patient Details
+                </h1>
+
+                <p id="currentDate">
+                    Patient information
+                </p>
+
+            </div>
+
+
+            <div class="header-right">
+
+                <div class="search-box">
+
+                    <span>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+
+                    <input
+                        type="text"
+                        placeholder="Search patients, doctors...">
+
+                </div>
+
+
+                <button type="button"
+                        class="header-icon notification">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-count">
+                        0
+                    </span>
+
+                </button>
+
+
+                <div class="profile">
+
+                    <div class="profile-avatar"
+                         id="profileAvatar">
+                        U
+                    </div>
+
+                    <div class="profile-info">
+
+                        <span class="profile-name"
+                              id="profileName">
+                            User
+                        </span>
+
+                        <span class="profile-role"
+                              id="profileRole">
+                            User
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+             ===================================================== -->
+
+        <section class="page-content"
+                 id="pageContent">
+
+
+            <!-- LOADING -->
+
+            <div class="card loading-state"
+                 id="loadingState">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <h2>
+                    Loading patient details...
+                </h2>
+
+                <p>
+                    Please wait.
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+
+<script th:src="@{/js/api.js}"></script>
+
+
+
+<script>
+
+
+    // =========================================================
+    // GLOBAL
+    // =========================================================
+
+    let patientId = null;
+
+    let patient = null;
+
+
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        async function () {
+
+            setCurrentDate();
+
+            loadProfile();
+
+
+            /*
+             * Expected URL:
+             *
+             * /ui/patient-details?id=5
+             */
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            patientId =
+                params.get("id");
+
+
+            if (!patientId) {
+
+                showError(
+                    "Patient ID was not provided."
+                );
+
+                return;
+
+            }
+
+
+            await loadPatient();
+
+        }
+    );
+
+
+
+    // =========================================================
+    // CURRENT DATE
+    // =========================================================
+
+    function setCurrentDate() {
+
+        const element =
+            document.getElementById(
+                "currentDate"
+            );
+
+
+        if (!element) {
+            return;
+        }
+
+
+        element.textContent =
+            new Date().toLocaleDateString(
+                "en-IN",
+                {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
+
+    }
+
+
+
+    // =========================================================
+    // TOKEN
+    // =========================================================
+
+    function getToken() {
+
+        return localStorage.getItem("token");
+
+    }
+
+
+
+    // =========================================================
+    // JWT
+    // =========================================================
+
+    function getUserFromToken() {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            const parts =
+                token.split(".");
+
+
+            if (
+                parts.length !== 3
+            ) {
+
+                return null;
+
+            }
+
+
+            return JSON.parse(
+                atob(
+                    parts[1]
+                        .replace(
+                            /-/g,
+                            "+"
+                        )
+                        .replace(
+                            /_/g,
+                            "/"
+                        )
+                )
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "JWT decode error:",
+                error
+            );
+
+            return null;
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // ROLE
+    // =========================================================
+
+    function getCurrentRole() {
+
+        const user =
+            getUserFromToken();
+
+
+        if (!user) {
+
+            return "";
+
+        }
+
+
+        let role =
+            user.role
+            ||
+            user.roles
+            ||
+            user.authorities;
+
+
+        if (
+            Array.isArray(role)
+        ) {
+
+            role =
+                role[0];
+
+        }
+
+
+        if (
+            role
+            &&
+            typeof role === "object"
+        ) {
+
+            role =
+                role.authority
+                ||
+                role.role;
+
+        }
+
+
+        return String(
+            role || ""
+        );
+
+    }
+
+
+
+    function normalizeRole(
+        role
+    ) {
+
+        return String(
+            role || ""
+        )
+        .replace(
+            "ROLE_",
+            ""
+        )
+        .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // PROFILE
+    // =========================================================
+
+    function loadProfile() {
+
+        const user =
+            getUserFromToken();
+
+
+        if (!user) {
+            return;
+        }
+
+
+        const username =
+            user.username
+            ||
+            user.name
+            ||
+            user.sub
+            ||
+            "User";
+
+
+        const role =
+            normalizeRole(
+                getCurrentRole()
+            );
+
+
+        document.getElementById(
+            "profileName"
+        ).textContent =
+            username;
+
+
+        document.getElementById(
+            "profileRole"
+        ).textContent =
+            formatRole(role);
+
+
+        document.getElementById(
+            "profileAvatar"
+        ).textContent =
+            username
+                .charAt(0)
+                .toUpperCase();
+
+    }
+
+
+
+    // =========================================================
+    // LOAD PATIENT
+    // =========================================================
+
+    async function loadPatient() {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            showError(
+                "Authentication token not found. Please login again."
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/patients/"
+                    +
+                    encodeURIComponent(
+                        patientId
+                    ),
+                    {
+
+                        method:
+                            "GET",
+
+                        headers: {
+
+                            "Authorization":
+                                "Bearer "
+                                +
+                                token,
+
+                            "Content-Type":
+                                "application/json"
+
+                        }
+
+                    }
+                );
+
+
+            if (
+                response.status === 401
+            ) {
+
+                showError(
+                    "Your session has expired. Please login again."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                response.status === 403
+            ) {
+
+                showError(
+                    "You are not authorized to view this patient."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                response.status === 404
+            ) {
+
+                showError(
+                    "Patient was not found."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !response.ok
+            ) {
+
+                throw new Error(
+                    "HTTP "
+                    +
+                    response.status
+                );
+
+            }
+
+
+            patient =
+                await response.json();
+
+
+            renderPatient();
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Patient loading error:",
+                error
+            );
+
+
+            showError(
+                "Unable to load patient details."
+            );
+
+        }
+
+    }
+
+
+
+    // =========================================================
+    // RENDER PATIENT
+    // =========================================================
+
+    function renderPatient() {
+
+        const content =
+            document.getElementById(
+                "pageContent"
+            );
+
+
+        const name =
+            patient.name
+            ||
+            "Unknown Patient";
+
+
+        const age =
+            patient.age
+            ??
+            "--";
+
+
+        const gender =
+            patient.gender
+            ||
+            "--";
+
+
+        const phone =
+            patient.phone
+            ||
+            "--";
+
+
+        const email =
+            patient.email
+            ||
+            "--";
+
+
+        const address =
+            patient.address
+            ||
+            "--";
+
+
+        content.innerHTML = `
+
+            <div class="card details-card">
+
+
+                <!-- =================================================
+                     CARD HEADER
+                     ================================================= -->
+
+                <div class="card-header">
+
+                    <div class="patient-profile">
+
+                        <div class="patient-avatar">
+
+                            ${escapeHtml(
+                                name
+                                    .charAt(0)
+                                    .toUpperCase()
+                            )}
+
+                        </div>
+
+
+                        <div class="patient-heading">
+
+                            <div class="patient-name">
+
+                                ${escapeHtml(
+                                    name
+                                )}
+
+                            </div>
+
+
+                            <div class="patient-label">
+
+                                Patient information
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <a href="/ui/patients"
+                       class="btn">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     DETAILS
+                     ================================================= -->
+
+                <div style="padding:25px;">
+
+
+                    <div class="details-grid">
+
+
+                        <!-- AGE -->
+
+                        <div class="detail-item">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-cake-candles detail-icon"></i>
+
+                                Age
+
+                            </span>
+
+
+                            <span class="detail-value">
+
+                                ${escapeHtml(
+                                    age
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- GENDER -->
+
+                        <div class="detail-item">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-venus-mars detail-icon"></i>
+
+                                Gender
+
+                            </span>
+
+
+                            <span class="detail-value">
+
+                                ${escapeHtml(
+                                    gender
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- PHONE -->
+
+                        <div class="detail-item">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-phone detail-icon"></i>
+
+                                Phone
+
+                            </span>
+
+
+                            <span class="detail-value">
+
+                                ${escapeHtml(
+                                    phone
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- EMAIL -->
+
+                        <div class="detail-item">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-envelope detail-icon"></i>
+
+                                Email
+
+                            </span>
+
+
+                            <span class="detail-value">
+
+                                ${escapeHtml(
+                                    email
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- ADDRESS -->
+
+                        <div class="detail-item full-width">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-location-dot detail-icon"></i>
+
+                                Address
+
+                            </span>
+
+
+                            <span class="detail-value">
+
+                                ${escapeHtml(
+                                    address
+                                )}
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ACTIONS
+                         ================================================= -->
+
+                    <div class="action-grid">
+
+
+                        <!-- MEDICAL RECORDS -->
+
+                        <a href="/ui/medical-records?patientId=${encodeURIComponent(
+                            patientId
+                        )}"
+                           class="btn btn-primary">
+
+                            <i class="fa-solid fa-file-medical"></i>
+
+                            Medical Records
+
+                        </a>
+
+
+
+                        <!-- BILLING -->
+
+                        <a href="/ui/billing?patientId=${encodeURIComponent(
+                            patientId
+                        )}"
+                           class="btn">
+
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+
+                            Billing
+
+                        </a>
+
+
+
+                        <!-- APPOINTMENTS -->
+
+                        <a href="/ui/appointments?patientId=${encodeURIComponent(
+                            patientId
+                        )}"
+                           class="btn">
+
+                            <i class="fa-solid fa-calendar-check"></i>
+
+                            Appointments
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // ERROR
+    // =========================================================
+
+    function showError(
+        message
+    ) {
+
+        const content =
+            document.getElementById(
+                "pageContent"
+            );
+
+
+        content.innerHTML = `
+
+            <div class="card error-state">
+
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <h2>
+                    Unable to Load Patient
+                </h2>
+
+                <p>
+
+                    ${escapeHtml(
+                        message
+                    )}
+
+                </p>
+
+
+                <a href="/ui/patients"
+                   class="btn btn-primary">
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Patients
+
+                </a>
+
+            </div>
+
+        `;
+
+    }
+
+
+
+    // =========================================================
+    // FORMAT ROLE
+    // =========================================================
+
+    function formatRole(
+        role
+    ) {
+
+        role =
+            normalizeRole(
+                role
+            );
+
+
+        if (!role) {
+
+            return "User";
+
+        }
+
+
+        return role
+            .charAt(0)
+            .toUpperCase()
+            +
+            role
+                .substring(1)
+                .toLowerCase();
+
+    }
+
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null
+            ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(
+            value
+        )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+    }
+
+
+
+    // =========================================================
+    // COMING SOON
+    // =========================================================
+
+    function showComingSoon(
+        event,
+        page
+    ) {
+
+        event.preventDefault();
+
+        alert(
+            page
+            +
+            " will be available soon."
+        );
+
+    }
+
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    function logout() {
+
+
+        localStorage.removeItem(
+            "token"
+        );
+
+
+
+        window.location.href =
+            "/login";
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

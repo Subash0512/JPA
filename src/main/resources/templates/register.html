@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Patient Registration | Hospital Management System</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef7fb 0%,
+                    #f8fbfd 50%,
+                    #e8f4f7 100%
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 900px;
+
+            background: #ffffff;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 20px 60px rgba(18, 59, 90, 0.12);
+
+            border: 1px solid #dce6ed;
+
+            overflow: hidden;
+        }
+
+        .register-header {
+            background:
+                linear-gradient(
+                    145deg,
+                    #123b5a,
+                    #0b557c
+                );
+
+            color: #ffffff;
+
+            padding: 30px 40px;
+        }
+
+        .register-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .register-logo {
+            width: 45px;
+            height: 45px;
+
+            border-radius: 10px;
+
+            background: #11b6b1;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .register-brand-name {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .register-brand-subtitle {
+            font-size: 10px;
+            color: rgba(255,255,255,0.65);
+            margin-top: 3px;
+        }
+
+        .register-body {
+            padding: 35px 40px;
+        }
+
+        .register-title {
+            margin-bottom: 25px;
+        }
+
+        .register-title h2 {
+            font-size: 25px;
+            font-weight: 600;
+            color: #182b3a;
+        }
+
+        .register-title p {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #667b8c;
+        }
+
+        .register-form {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 17px;
+        }
+
+        .register-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .register-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .register-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #334b5c;
+        }
+
+        .register-input,
+        .register-select {
+            width: 100%;
+
+            height: 43px;
+
+            border: 1px solid #dce6ed;
+
+            border-radius: 7px;
+
+            outline: none;
+
+            padding: 0 12px;
+
+            font-size: 12px;
+
+            color: #182b3a;
+
+            background: #ffffff;
+        }
+
+        .register-input:focus,
+        .register-select:focus {
+            border-color: #0f6fae;
+
+            box-shadow:
+                0 0 0 3px rgba(15,111,174,0.08);
+        }
+
+        .register-button {
+            grid-column: 1 / -1;
+
+            width: 100%;
+
+            height: 43px;
+
+            border: 0;
+
+            border-radius: 7px;
+
+            background: #0f6fae;
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .register-button:hover {
+            background: #0b4f7c;
+        }
+
+        .register-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .register-message {
+            grid-column: 1 / -1;
+
+            display: none;
+
+            padding: 10px 12px;
+
+            border-radius: 6px;
+
+            font-size: 10px;
+        }
+
+        .register-message.show {
+            display: block;
+        }
+
+        .register-message.error {
+            background: #fdebed;
+            border: 1px solid #f5c8cc;
+            color: #c5303b;
+        }
+
+        .register-message.success {
+            background: #eaf8f0;
+            border: 1px solid #b9e5ca;
+            color: #237a45;
+        }
+
+        .login-link {
+            text-align: center;
+
+            margin-top: 22px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid #e5edf2;
+
+            font-size: 10px;
+
+            color: #667b8c;
+        }
+
+        .login-link a {
+            color: #0f6fae;
+
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 650px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .register-header {
+                padding: 25px;
+            }
+
+            .register-body {
+                padding: 30px 25px;
+            }
+
+            .register-form {
+                grid-template-columns: 1fr;
+            }
+
+            .register-field.full {
+                grid-column: auto;
+            }
+
+            .register-button,
+            .register-message {
+                grid-column: auto;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="register-container">
+
+    <!-- HEADER -->
+
+    <div class="register-header">
+
+        <div class="register-brand">
+
+            <div class="register-logo">
+                +
+            </div>
+
+            <div>
+
+                <div class="register-brand-name">
+                    Hospital Management System
+                </div>
+
+                <div class="register-brand-subtitle">
+                    Integrated Hospital Information System
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BODY -->
+
+    <div class="register-body">
+
+        <div class="register-title">
+
+            <h2>
+                Create Patient Account
+            </h2>
+
+            <p>
+                Register as a patient to access your hospital services.
+            </p>
+
+        </div>
+
+
+        <form
+            id="registerForm"
+            class="register-form"
+        >
+
+            <!-- FULL NAME -->
+
+            <div class="register-field full">
+
+                <label
+                    class="register-label"
+                    for="name"
+                >
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    class="register-input"
+                    placeholder="Enter your full name"
+                    required
+                >
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="age"
+                >
+                    Age
+                </label>
+
+                <input
+                    type="number"
+                    id="age"
+                    class="register-input"
+                    placeholder="Enter your age"
+                    min="1"
+                    max="120"
+                    required
+                >
+
+            </div>
+
+
+            <!-- GENDER -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="gender"
+                >
+                    Gender
+                </label>
+
+                <select
+                    id="gender"
+                    class="register-select"
+                    required
+                >
+
+                    <option value="">
+                        Select gender
+                    </option>
+
+                    <option value="Male">
+                        Male
+                    </option>
+
+                    <option value="Female">
+                        Female
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="phone"
+                >
+                    Phone
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    class="register-input"
+                    placeholder="Enter phone number"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="email"
+                >
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    class="register-input"
+                    placeholder="Enter email address"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ADDRESS -->
+
+            <div class="register-field full">
+
+                <label
+                    class="register-label"
+                    for="address"
+                >
+                    Address
+                </label>
+
+                <input
+                    type="text"
+                    id="address"
+                    class="register-input"
+                    placeholder="Enter your address"
+                    required
+                >
+
+            </div>
+
+
+            <!-- USERNAME -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="username"
+                >
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    class="register-input"
+                    placeholder="Create a username"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="password"
+                >
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    class="register-input"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div class="register-field">
+
+                <label
+                    class="register-label"
+                    for="confirmPassword"
+                >
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    class="register-input"
+                    placeholder="Confirm your password"
+                    autocomplete="new-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div
+                id="registerMessage"
+                class="register-message"
+            ></div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                id="registerButton"
+                class="register-button"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+
+        <!-- LOGIN -->
+
+        <div class="login-link">
+
+            Already have an account?
+
+            <a href="/login">
+                Sign in
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script th:src="@{/js/api.js}"></script>
+
+<script>
+
+    const registerForm =
+        document.getElementById("registerForm");
+
+    const registerButton =
+        document.getElementById("registerButton");
+
+    const registerMessage =
+        document.getElementById("registerMessage");
+
+
+    registerForm.addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            registerMessage.className =
+                "register-message";
+
+            registerMessage.textContent = "";
+
+
+            const password =
+                document.getElementById("password").value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+
+            /*
+             * Password confirmation
+             */
+
+            if (password !== confirmPassword) {
+
+                showMessage(
+                    "Passwords do not match.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            /*
+             * Create patient object
+             */
+
+            const patient = {
+
+                name:
+                    document.getElementById("name").value.trim(),
+
+                age:
+                    Number(
+                        document.getElementById("age").value
+                    ),
+
+                gender:
+                    document.getElementById("gender").value,
+
+                phone:
+                    document.getElementById("phone").value.trim(),
+
+                email:
+                    document.getElementById("email").value.trim(),
+
+                address:
+                    document.getElementById("address").value.trim()
+            };
+
+
+            /*
+             * Registration request
+             */
+
+            const request = {
+
+                username:
+                    document.getElementById("username").value.trim(),
+
+                password:
+                    password,
+
+                patient:
+                    patient
+            };
+
+
+            registerButton.disabled = true;
+
+            registerButton.textContent =
+                "Creating Account...";
+
+
+            try {
+
+                const response =
+                    await apiPost(
+                        "/auth/register/patient",
+                        request
+                    );
+
+
+                showMessage(
+                    "Account created successfully. Redirecting to login...",
+                    "success"
+                );
+
+
+                setTimeout(
+                    function() {
+
+                        window.location.href =
+                            "/login";
+
+                    },
+                    1500
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Registration failed:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Registration failed. Please try again.",
+                    "error"
+                );
+
+                registerButton.disabled = false;
+
+                registerButton.textContent =
+                    "Create Account";
+            }
+
+        }
+    );
+
+
+    function showMessage(message, type) {
+
+        registerMessage.textContent =
+            message;
+
+        registerMessage.className =
+            "register-message show " + type;
+    }
+
+</script>
+
+</body>
+
+</html>
